@@ -16,7 +16,7 @@ enum app_state
 struct app 
 {
     app_state_t state;
-    sdl_t sdl;
+    graphics_t graphics;
 };
 
 bool app_init(app_t *app);

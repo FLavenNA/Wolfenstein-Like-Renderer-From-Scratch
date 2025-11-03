@@ -1,23 +1,28 @@
 #include "sdl.h"
 #include "application.h"
 
-bool sdl_init(sdl_t *sdl) 
+bool sdl_init(graphics_t *graphics) 
 {
     if(!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
         SDL_Log("Failed to init SDL !");
         return false;
     }
 
-    sdl->window = SDL_CreateWindow("Wolfenstein Like Renderer", 1280, 720, SDL_WINDOW_RESIZABLE);
+    graphics->window = SDL_CreateWindow("Wolfenstein Like Renderer", WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_RESIZABLE);
 
-    if(!sdl->window) {
+    if(!graphics->window) {
         SDL_Log("Could not create SDL window !");
         return false;
     }
 
-    sdl->renderer = SDL_CreateRenderer(sdl->window, NULL);
+    if(!SDL_SetWindowMinimumSize(graphics->window, MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)) {
+        SDL_Log("Failed to set minimum window size !");
+        return false;
+    }
 
-    if(!sdl->renderer) {
+    graphics->renderer = SDL_CreateRenderer(graphics->window, NULL);
+
+    if(!graphics->renderer) {
         SDL_Log("Could not create SDL renderer !");
         return false;
     }
@@ -25,10 +30,10 @@ bool sdl_init(sdl_t *sdl)
     return true;
 }
 
-void sdl_cleanup(const sdl_t *sdl) 
+void sdl_cleanup(const graphics_t *graphics) 
 {
-    SDL_DestroyWindow(sdl->window);
-    SDL_DestroyRenderer(sdl->renderer);
+    SDL_DestroyWindow(graphics->window);
+    SDL_DestroyRenderer(graphics->renderer);
     SDL_Quit();
 }
 
@@ -46,4 +51,16 @@ void handle_input(app_t *app)
                 break;
         }
     }
+}
+
+void update()
+{
+
+}
+
+void render(const graphics_t *graphics)
+{
+    SDL_RenderClear(graphics->renderer);
+    SDL_SetRenderDrawColor(graphics->renderer, 0, 255, 0, 255);
+    SDL_RenderPresent(graphics->renderer);
 }

@@ -1,10 +1,18 @@
 #include "sdl.h"
 #include "application.h"
 
+#include <SDL3_ttf/SDL_ttf.h>
+#include <stdio.h>
+
 bool sdl_init(graphics_t *graphics) 
 {
     if(!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
         SDL_Log("Failed to init SDL !");
+        return false;
+    }
+
+    if(!TTF_Init()) {
+        SDL_Log("Failed to init SDL_ttf !");
         return false;
     }
 
@@ -27,6 +35,13 @@ bool sdl_init(graphics_t *graphics)
         return false;
     }
 
+    graphics->font = TTF_OpenFont("assets/fonts/ComicSans.ttf", 32);
+
+    if(!graphics->font) {
+        SDL_Log("TTF_OpenFont() error !");
+        return false;
+    }
+
     return true;
 }
 
@@ -34,6 +49,7 @@ void sdl_cleanup(const graphics_t *graphics)
 {
     SDL_DestroyWindow(graphics->window);
     SDL_DestroyRenderer(graphics->renderer);
+    TTF_Quit();
     SDL_Quit();
 }
 
@@ -53,14 +69,71 @@ void handle_input(app_t *app)
     }
 }
 
-void update()
+void render(graphics_t *graphics)
 {
-
+    // Clear previous frame
+    SDL_SetRenderDrawColor(graphics->renderer, 0, 0, 0, 255); // black background (or whatever you want)
+    SDL_RenderClear(graphics->renderer);
+    // TODO: Do rendering stuff in here
+    draw_fps_counter(graphics);
+    SDL_RenderPresent(graphics->renderer);
 }
 
-void render(const graphics_t *graphics)
+void draw_fps_counter(const graphics_t *graphics)
 {
-    SDL_RenderClear(graphics->renderer);
-    SDL_SetRenderDrawColor(graphics->renderer, 0, 255, 0, 255);
-    SDL_RenderPresent(graphics->renderer);
+    if (!graphics || !graphics->avg_fps || !graphics->font || !graphics->renderer)
+        return;
+
+    char buffer[10];
+    snprintf(buffer, sizeof(buffer), "%.2f", graphics->avg_fps);
+
+    SDL_Color white = {255, 255, 255, 255};
+
+    SDL_Surface *surface = TTF_RenderText_Blended(graphics->font, buffer, strlen(buffer), white);
+    if (!surface) {
+        SDL_Log("TTF_RenderText_Blended failed");
+        return;
+    }
+
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(graphics->renderer, surface);
+    if (!texture) {
+        SDL_Log("SDL_CreateTextureFromSurface failed: %s", SDL_GetError());
+        SDL_DestroySurface(surface);
+        return;
+    }
+
+    // Use text size to set correct rects
+    float margin = 10.0f;   // margin from window edge
+    float padding = 6.0f;   // padding inside the background box
+
+    float text_w = (float)surface->w;
+    float text_h = (float)surface->h;
+
+    SDL_FRect dstRect = {
+        margin + padding,
+        margin + padding,
+        text_w,
+        text_h
+    };
+
+    SDL_FRect bgRect = {
+        margin,
+        margin,
+        text_w + padding * 2.0f,
+        text_h + padding * 2.0f
+    };
+
+    SDL_DestroySurface(surface);
+
+    SDL_SetRenderDrawBlendMode(graphics->renderer, SDL_BLENDMODE_BLEND);
+
+    // Half-transparent dark gray background
+    SDL_SetRenderDrawColor(graphics->renderer, 50, 50, 50, 150);
+    SDL_RenderFillRect(graphics->renderer, &bgRect); // Must use &bgRect!
+
+    // Draw the text on top
+    SDL_RenderTexture(graphics->renderer, texture, NULL, &dstRect);
+
+    // Cleanup texture
+    SDL_DestroyTexture(texture);
 }

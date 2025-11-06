@@ -16,11 +16,19 @@ add_subdirectory(libs/SDL EXCLUDE_FROM_ALL)
 add_subdirectory(libs/SDL_ttf EXCLUDE_FROM_ALL)
 
 # Collect all .c files in src/
-file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/src/*.c")
+file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS 
+    "${CMAKE_SOURCE_DIR}/src/*.c"
+    "${CMAKE_SOURCE_DIR}/src/core/*.c"
+    "${CMAKE_SOURCE_DIR}/src/render/*.c"
+    "${CMAKE_SOURCE_DIR}/src/utils/*.c")
 
 add_executable(Wolfenstein-Like-Renderer ${SRC_FILES})
 
-target_include_directories(Wolfenstein-Like-Renderer PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(Wolfenstein-Like-Renderer PRIVATE
+                         ${CMAKE_SOURCE_DIR}/include
+                         ${CMAKE_SOURCE_DIR}/include/core
+                         ${CMAKE_SOURCE_DIR}/include/render
+                         ${CMAKE_SOURCE_DIR}/include/utils)
 
 target_link_libraries(Wolfenstein-Like-Renderer 
     PRIVATE

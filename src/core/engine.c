@@ -1,17 +1,16 @@
-#include "application.h"
-#include <stdio.h>
+#include "engine.h"
 
-bool app_init(app_t *app)
+bool engine_init(engine_t *engine)
 {
-    if(!sdl_init(&app->graphics)) 
+    if(!graphics_init(&engine->graphics)) 
         return false;
 
 
-    app->state = RUNNING;
+    engine->state = RUNNING;
     return true;
 }
 
-void app_run(app_t *app)
+void engine_run(engine_t *engine)
 {
     const float frame_time = 1000.0f / TARGET_FPS;
     float delta_time = 0.0f;
@@ -19,13 +18,13 @@ void app_run(app_t *app)
     int frame_count = 0;
     float fps = 0.0f;
 
-    while(app->state != QUIT) {
+    while(engine->state != QUIT) {
 
         // get_time() before running instructions;
         const uint64_t start_frame_time = SDL_GetPerformanceCounter();
 
-        handle_input(app);
-        render(&app->graphics);
+        handle_input(engine);
+        render(&engine->graphics);
 
         const uint64_t end_frame_time = SDL_GetPerformanceCounter();
 
@@ -46,12 +45,12 @@ void app_run(app_t *app)
             fps = (float)frame_count * (1000.0f / fps_timer);
             frame_count = 0;
             fps_timer = 0.0f;
-            app->graphics.avg_fps = fps;
+            engine->graphics.avg_fps = fps;
         }
     }
 }
 
-void app_cleanup(const app_t *app)
+void engine_cleanup(const engine_t *engine)
 {
-    sdl_cleanup(&app->graphics);
+    graphics_cleanup(&engine->graphics);
 }

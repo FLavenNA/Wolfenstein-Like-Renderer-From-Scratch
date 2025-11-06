@@ -1,10 +1,8 @@
-#include "sdl.h"
-#include "application.h"
+#include "graphics.h"
 
-#include <SDL3_ttf/SDL_ttf.h>
 #include <stdio.h>
 
-bool sdl_init(graphics_t *graphics) 
+bool graphics_init(graphics_t *graphics) 
 {
     if(!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
         SDL_Log("Failed to init SDL !");
@@ -45,38 +43,12 @@ bool sdl_init(graphics_t *graphics)
     return true;
 }
 
-void sdl_cleanup(const graphics_t *graphics) 
+void graphics_cleanup(const graphics_t *graphics) 
 {
     SDL_DestroyWindow(graphics->window);
     SDL_DestroyRenderer(graphics->renderer);
     TTF_Quit();
     SDL_Quit();
-}
-
-void handle_input(app_t *app)
-{
-    SDL_Event event;
-
-    while(SDL_PollEvent(&event))
-    {
-        // TODO: Handle events here
-        switch(event.type) 
-        {
-            case SDL_EVENT_QUIT:
-                app->state = QUIT;
-                break;
-        }
-    }
-}
-
-void render(graphics_t *graphics)
-{
-    // Clear previous frame
-    SDL_SetRenderDrawColor(graphics->renderer, 0, 0, 0, 255); // black background (or whatever you want)
-    SDL_RenderClear(graphics->renderer);
-    // TODO: Do rendering stuff in here
-    draw_fps_counter(graphics);
-    SDL_RenderPresent(graphics->renderer);
 }
 
 void draw_fps_counter(const graphics_t *graphics)

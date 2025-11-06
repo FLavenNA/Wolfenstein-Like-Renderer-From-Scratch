@@ -1,16 +1,14 @@
-#include <stdio.h>
-
-#include "application.h"
+#include "engine.h"
 
 int main(int argc, char **argv) {
     (void) argc;
     (void) argv;
 
-    app_t app;
+    engine_t engine = {0};
 
-    app_init(&app);
-    app_run(&app);
-    app_cleanup(&app);
+    engine_init(&engine);
+    engine_run(&engine);
+    engine_cleanup(&engine);
 
     return 0;
 }

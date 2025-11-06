@@ -3,7 +3,6 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
-#include <stdbool.h>
 
 #include "type_defs.h"
 
@@ -18,15 +17,11 @@ struct graphics {
     SDL_Renderer *renderer;
 
     TTF_Font *font;
-
     float avg_fps;
 };
 
-bool sdl_init(graphics_t *graphics);
-void sdl_cleanup(const graphics_t *graphics);
-
-void handle_input(app_t *app);
-void render(graphics_t *graphics);
+bool graphics_init(graphics_t *graphics);
+void graphics_cleanup(const graphics_t *graphics);
 
 void draw_fps_counter(const graphics_t *graphics);
 

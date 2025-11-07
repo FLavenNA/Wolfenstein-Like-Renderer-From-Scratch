@@ -3,6 +3,7 @@
 
 #include "type_defs.h"
 #include "graphics.h"
+#include "map.h"
 
 enum engine_state
 {
@@ -15,6 +16,7 @@ struct engine
 {
     engine_state_t state;
     graphics_t graphics;
+    map_t map;
 };
 
 bool engine_init(engine_t *engine);

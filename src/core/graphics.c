@@ -62,6 +62,7 @@ void draw_fps_counter(const graphics_t *graphics)
     SDL_Color white = {255, 255, 255, 255};
 
     SDL_Surface *surface = TTF_RenderText_Blended(graphics->font, buffer, strlen(buffer), white);
+
     if (!surface) {
         SDL_Log("TTF_RenderText_Blended failed");
         return;

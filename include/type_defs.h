@@ -18,4 +18,7 @@ typedef struct sectors_queue sectors_queue_t;
 // Utils type defs
 typedef struct vec2 vec2_t;
 
+// Game type defs
+typedef struct map map_t;
+
 #endif

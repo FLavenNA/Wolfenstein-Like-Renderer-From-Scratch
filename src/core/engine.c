@@ -1,10 +1,12 @@
 #include "engine.h"
+#include "renderer.h"
 
 bool engine_init(engine_t *engine)
 {
     if(!graphics_init(&engine->graphics)) 
         return false;
 
+    map_init(&engine->map);
 
     engine->state = RUNNING;
     return true;
@@ -24,7 +26,7 @@ void engine_run(engine_t *engine)
         const uint64_t start_frame_time = SDL_GetPerformanceCounter();
 
         handle_input(engine);
-        render(&engine->graphics);
+        render(engine);
 
         const uint64_t end_frame_time = SDL_GetPerformanceCounter();
 

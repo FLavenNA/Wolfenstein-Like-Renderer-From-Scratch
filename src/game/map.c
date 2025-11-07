@@ -1,0 +1,61 @@
+#include <stdio.h>
+
+#include "map.h"
+#include "colors.h"
+
+void map_init(map_t *map)
+{
+    // Simple rectangular room
+    int layout[MAP_HEIGHT][MAP_WIDTH] = {
+        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,1,1,0,0,0,0,0,1,1,0,0,0,1},
+        {1,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1},
+        {1,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,1,0,1,1,0,0,0,0,1,1,0,1,0,1},
+        {1,0,1,0,1,1,0,1,1,0,1,1,0,1,0,1},
+        {1,0,1,0,0,0,0,1,1,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1},
+        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+    };
+
+    for (int y = 0; y < MAP_HEIGHT; ++y)
+        for (int x = 0; x < MAP_WIDTH; ++x)
+            map->data[y][x] = layout[y][x];
+}
+
+void map_draw(SDL_Renderer *renderer, const map_t *map)
+{
+    if (!renderer || !map)
+        return;
+
+    int window_w, window_h;
+    SDL_GetCurrentRenderOutputSize(renderer, &window_w, &window_h);
+
+    float map_w_px = MAP_WIDTH * TILE_SIZE;
+    float map_h_px = MAP_HEIGHT * TILE_SIZE;
+    float padding = 10.0f;
+
+    float offset_x = window_w - map_w_px - padding;
+    float offset_y = padding;
+
+    for (int y = 0; y < MAP_HEIGHT; ++y) {
+        for (int x = 0; x < MAP_WIDTH; ++x) {
+            SDL_FRect r = { offset_x + x * TILE_SIZE,
+                            offset_y + y * TILE_SIZE,
+                            TILE_SIZE,
+                            TILE_SIZE };
+
+            if (map->data[y][x] == 1)
+                SDL_SetRenderDrawColor(renderer, MINI_MAP_WALL_COLOR.r, MINI_MAP_WALL_COLOR.g, 
+                                        MINI_MAP_WALL_COLOR.b, MINI_MAP_WALL_COLOR.a);
+            else
+                SDL_SetRenderDrawColor(renderer, MINI_MAP_PATH_COLOR.r, MINI_MAP_PATH_COLOR.g, 
+                                        MINI_MAP_PATH_COLOR.b, MINI_MAP_PATH_COLOR.a);
+
+            SDL_RenderFillRect(renderer, &r);
+        }
+    }
+}

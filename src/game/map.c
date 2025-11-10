@@ -2,6 +2,8 @@
 
 #include "map.h"
 #include "colors.h"
+#include "player.h"
+#include "renderer.h"
 
 void map_init(map_t *map)
 {
@@ -26,7 +28,7 @@ void map_init(map_t *map)
             map->data[y][x] = layout[y][x];
 }
 
-void map_draw(SDL_Renderer *renderer, const map_t *map)
+void map_draw(SDL_Renderer *renderer, const map_t *map, const player_t *player)
 {
     if (!renderer || !map)
         return;
@@ -57,5 +59,26 @@ void map_draw(SDL_Renderer *renderer, const map_t *map)
 
             SDL_RenderFillRect(renderer, &r);
         }
+    }
+
+    if (player) {
+        // Convert world (tile) coords -> minimap pixels and center in tile.
+        // If your player coordinates are already in pixels, remove the * TILE_SIZE.
+        const float player_map_x = offset_x + (float)player->position.x * TILE_SIZE + 0.5f * TILE_SIZE;
+        const float player_map_y = offset_y + (float)player->position.y * TILE_SIZE + 0.5f * TILE_SIZE;
+
+        const float player_radius = TILE_SIZE * 0.25f; // dot radius (adjust)
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // red
+        SDL_RenderFillCircleF(renderer, player_map_x, player_map_y, player_radius);
+
+        // facing line
+        const float line_length = TILE_SIZE * 0.8f;
+        const float line_x = player_map_x + cosf((float)player->dir_angle) * line_length;
+        const float line_y = player_map_y + sinf((float)player->dir_angle) * line_length;
+
+        SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255); // yellow
+        SDL_RenderLine(renderer,
+                       (int)roundf(player_map_x), (int)roundf(player_map_y),
+                       (int)roundf(line_x), (int)roundf(line_y));
     }
 }

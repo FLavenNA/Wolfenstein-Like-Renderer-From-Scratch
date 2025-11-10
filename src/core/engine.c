@@ -6,6 +6,8 @@ bool engine_init(engine_t *engine)
     if(!graphics_init(&engine->graphics)) 
         return false;
 
+    input_init(&engine->key_map, &engine->key_states);
+    player_init(&engine->player, 1.0, 1.0, 0);
     map_init(&engine->map);
 
     engine->state = RUNNING;
@@ -15,32 +17,35 @@ bool engine_init(engine_t *engine)
 void engine_run(engine_t *engine)
 {
     const float frame_time = 1000.0f / TARGET_FPS;
-    float delta_time = 0.0f;
     float fps_timer = 0.0f;
     int frame_count = 0;
     float fps = 0.0f;
+    float delta_time = 0.0f;
+
+    uint64_t last_counter = SDL_GetPerformanceCounter();
 
     while(engine->state != QUIT) {
+        uint64_t current_counter = SDL_GetPerformanceCounter();
+        float delta_time = (float)((current_counter - last_counter) * 1000.0)
+                           / SDL_GetPerformanceFrequency();
+        last_counter = current_counter;
 
-        // get_time() before running instructions;
-        const uint64_t start_frame_time = SDL_GetPerformanceCounter();
-
-        handle_input(engine);
+        handle_input(engine, delta_time);
         render(engine);
 
-        const uint64_t end_frame_time = SDL_GetPerformanceCounter();
+        // Frame pacing
+        uint64_t frame_end = SDL_GetPerformanceCounter();
+        float frame_elapsed = (float)((frame_end - current_counter) * 1000.0)
+                              / SDL_GetPerformanceFrequency();
 
-        // Delay if needed 
-        delta_time =  (float)((end_frame_time - start_frame_time) * 1000) / SDL_GetPerformanceFrequency();
-
-        // Calculate AVG Fps and Delay to make sure it stays on 60 FPS if its needed
-        frame_count++;
-        if(frame_time > delta_time) {
-            fps_timer += delta_time + frame_time - delta_time;
-            SDL_Delay((uint32_t)(frame_time > delta_time ? frame_time - delta_time : 0));
+        // Delay just enough to hit 60 fps
+        if (frame_elapsed < frame_time)
+        {
+            SDL_Delay((Uint32)(frame_time - frame_elapsed));
         }
-        else
-            fps_timer += delta_time;
+
+        fps_timer += delta_time;
+        frame_count++;
 
         if (fps_timer >= 1000.0f)
         {

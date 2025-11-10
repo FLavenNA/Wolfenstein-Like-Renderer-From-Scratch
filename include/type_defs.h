@@ -8,17 +8,17 @@
 typedef struct graphics graphics_t;
 typedef enum engine_state engine_state_t;
 typedef struct engine engine_t;
+typedef struct keymap keymap_t;
+typedef struct key_states key_states_t;
+typedef enum kdb_key_state kdb_key_state_t;
 
 // Render type defs
-typedef struct plane plane_lut_t; // Lookup table
-typedef struct wall wall_t;
-typedef struct sector sector_t;
-typedef struct sectors_queue sectors_queue_t;
 
 // Utils type defs
 typedef struct vec2 vec2_t;
 
 // Game type defs
 typedef struct map map_t;
+typedef struct player player_t;
 
 #endif

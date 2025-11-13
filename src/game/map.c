@@ -36,17 +36,17 @@ void map_draw(SDL_Renderer *renderer, const map_t *map, const player_t *player)
     int window_w, window_h;
     SDL_GetCurrentRenderOutputSize(renderer, &window_w, &window_h);
 
-    float map_w_px = MAP_WIDTH * TILE_SIZE;
-    float map_h_px = MAP_HEIGHT * TILE_SIZE;
-    float padding = 10.0f;
+    const float map_w_px = MAP_WIDTH * TILE_SIZE;
+    const float map_h_px = MAP_HEIGHT * TILE_SIZE;
+    const float padding = 10.0f;
 
-    float offset_x = window_w - map_w_px - padding;
-    float offset_y = padding;
+    const float offset_x = (float)window_w - map_w_px - padding;
+    const float offset_y = padding;
 
     for (int y = 0; y < MAP_HEIGHT; ++y) {
         for (int x = 0; x < MAP_WIDTH; ++x) {
-            SDL_FRect r = { offset_x + x * TILE_SIZE,
-                            offset_y + y * TILE_SIZE,
+            SDL_FRect r = { offset_x + (float)x * TILE_SIZE,
+                            offset_y + (float)y * TILE_SIZE,
                             TILE_SIZE,
                             TILE_SIZE };
 
@@ -78,7 +78,7 @@ void map_draw(SDL_Renderer *renderer, const map_t *map, const player_t *player)
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255); // yellow
         SDL_RenderLine(renderer,
-                       (int)roundf(player_map_x), (int)roundf(player_map_y),
-                       (int)roundf(line_x), (int)roundf(line_y));
+                       roundf(player_map_x), roundf(player_map_y),
+                       roundf(line_x), roundf(line_y));
     }
 }

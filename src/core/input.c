@@ -63,19 +63,19 @@ void process_key_states(const key_states_t *key_states, player_t *player, float 
     }
 
     if (key_states->left)
-        player->dir_angle += ROT_SPEED * delta_time;
-    else if (key_states->right)
         player->dir_angle -= ROT_SPEED * delta_time;
+    else if (key_states->right)
+        player->dir_angle += ROT_SPEED * delta_time;
 
     if (key_states->strafe_left)
     {
-        player->position.x += MOV_SPEED * cos(player->dir_angle + M_PI / 2) * delta_time;
-        player->position.y += MOV_SPEED * sin(player->dir_angle + M_PI / 2) * delta_time;
+        player->position.x -= MOV_SPEED * cos(player->dir_angle + M_PI / 2) * delta_time;
+        player->position.y -= MOV_SPEED * sin(player->dir_angle + M_PI / 2) * delta_time;
     }
     else if (key_states->strafe_right)
     {
-        player->position.x -= MOV_SPEED * cos(player->dir_angle + M_PI / 2) * delta_time;
-        player->position.y -= MOV_SPEED * sin(player->dir_angle + M_PI / 2) * delta_time;
+        player->position.x += MOV_SPEED * cos(player->dir_angle + M_PI / 2) * delta_time;
+        player->position.y += MOV_SPEED * sin(player->dir_angle + M_PI / 2) * delta_time;
     }
 }
 

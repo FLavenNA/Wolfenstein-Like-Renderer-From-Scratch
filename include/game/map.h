@@ -4,7 +4,6 @@
 #include <SDL3/SDL.h>
 
 #include "type_defs.h"
-#include "graphics.h"
 
 #define MAP_WIDTH   16
 #define MAP_HEIGHT  12
@@ -15,6 +14,6 @@ struct map {
 };
 
 void map_init(map_t *map);
-void map_draw(SDL_Renderer *renderer, const map_t *map, const player_t *player);
+void map_draw(const graphics_t *graphics, const map_t *map, const player_t *player);
 
 #endif

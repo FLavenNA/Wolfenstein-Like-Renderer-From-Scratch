@@ -42,6 +42,11 @@ void handle_input(engine_t *engine, float delta_time)
             case SDL_EVENT_KEY_UP:
                 handle_real_time_keys(event.key.scancode, KEY_STATE_UP, &engine->key_map, &engine->key_states);
                 break;
+            case SDL_EVENT_WINDOW_RESIZED:
+                int new_width, new_height;
+                SDL_GetWindowSize(engine->graphics.window, &new_width, &new_height);
+                graphics_resize(&engine->graphics, new_width, new_height);
+                break;
             default: 
                 break;
         }
@@ -49,7 +54,7 @@ void handle_input(engine_t *engine, float delta_time)
     process_key_states(&engine->key_states, &engine->player, delta_time);
 }
 
-void process_key_states(const key_states_t *key_states, player_t *player, float delta_time) 
+void process_key_states(const key_states_t *key_states, player_t *player, const float delta_time)
 {
     if (key_states->forward)
     {
@@ -79,7 +84,7 @@ void process_key_states(const key_states_t *key_states, player_t *player, float 
     }
 }
 
-void handle_real_time_keys(SDL_Scancode scan_code, enum kdb_key_state_t state, const keymap_t *key_map,  key_states_t *key_states)
+void handle_real_time_keys(const SDL_Scancode scan_code, const kdb_key_state_t state, const keymap_t *key_map,  key_states_t *key_states)
 {
     if (scan_code == key_map->forward)
         key_states->forward = state;

@@ -7,7 +7,7 @@ bool engine_init(engine_t *engine)
         return false;
 
     input_init(&engine->key_map, &engine->key_states);
-    player_init(&engine->player, 1.0, 1.0, 0);
+    player_init(&engine->player, 1.0, 1.0, M_PI / 2);
     map_init(&engine->map);
 
     engine->state = RUNNING;
@@ -57,7 +57,7 @@ void engine_run(engine_t *engine)
     }
 }
 
-void engine_cleanup(const engine_t *engine)
+void engine_cleanup(engine_t *engine)
 {
     graphics_cleanup(&engine->graphics);
 }

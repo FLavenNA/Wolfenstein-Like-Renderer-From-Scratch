@@ -7,12 +7,12 @@
 #include "player.h"
 #include "input.h"
 
-enum engine_state
+typedef enum engine_state
 {
     PAUSED,
     RUNNING,
     QUIT
-};
+} engine_state_t;
 
 struct engine 
 {
@@ -26,6 +26,6 @@ struct engine
 
 bool engine_init(engine_t *engine);
 void engine_run(engine_t *engine);
-void engine_cleanup(const engine_t *engine);
+void engine_cleanup(engine_t *engine);
 
 #endif

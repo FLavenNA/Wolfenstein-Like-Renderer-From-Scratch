@@ -3,9 +3,14 @@
 
 #include <SDL3/SDL.h>
 
-// Mini map colors
-static const SDL_Color MINI_MAP_WALL_COLOR   = {100, 100, 100, 255};
-static const SDL_Color MINI_MAP_PATH_COLOR   = {220, 220, 220, 255};
+// Even we use RGBA32 SDL decides depending on machine is little endian or big endian
+// For my machine it stores as ARGB
 
+// Mini map colors
+#define MINI_MAP_WALL_COLOR 0xFF646464
+#define MINI_MAP_PATH_COLOR 0xFFDCDCDC
+
+// FPS COLORS
+#define FPS_COUNTER_BG 0x80323232 // FPS Background color - Transparent Gray
 
 #endif

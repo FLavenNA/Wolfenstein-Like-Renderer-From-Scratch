@@ -30,14 +30,14 @@ struct key_states {
     bool quit;
 };
 
-enum kdb_key_state {
+typedef enum kdb_key_state {
     KEY_STATE_UP = 0,
     KEY_STATE_DOWN,
-};
+} kdb_key_state_t;
 
 void input_init(keymap_t *key_map, key_states_t *key_states);
-void handle_input(engine_t *engine, float delta_time);
+void handle_input(engine_t *engine, const float delta_time);
 void process_key_states(const key_states_t *key_states, player_t *player, float delta_time);
-void handle_real_time_keys(SDL_Scancode scan_code, enum kdb_key_state_t state, const keymap_t *key_map,  key_states_t *key_states);
+void handle_real_time_keys(const SDL_Scancode scan_code, const kdb_key_state_t state, const keymap_t *key_map,  key_states_t *key_states);
 
 #endif

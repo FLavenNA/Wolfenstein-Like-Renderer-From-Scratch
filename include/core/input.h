@@ -16,6 +16,7 @@ struct keymap {
     SDL_Scancode strafe_left;
     SDL_Scancode strafe_right;
     SDL_Scancode toggle_map;
+    SDL_Scancode pause;
     SDL_Scancode quit;
 };
 
@@ -27,6 +28,7 @@ struct key_states {
     bool strafe_left;
     bool strafe_right;
     bool map_state;
+    bool pause;
     bool quit;
 };
 
@@ -36,8 +38,8 @@ typedef enum kdb_key_state {
 } kdb_key_state_t;
 
 void input_init(keymap_t *key_map, key_states_t *key_states);
-void handle_input(engine_t *engine, const float delta_time);
-void process_key_states(const key_states_t *key_states, player_t *player, float delta_time);
-void handle_real_time_keys(const SDL_Scancode scan_code, const kdb_key_state_t state, const keymap_t *key_map,  key_states_t *key_states);
+void handle_input(engine_t *engine, float delta_time);
+void process_key_states(engine_t *engine, float delta_time);
+void handle_real_time_keys(SDL_Scancode scan_code, kdb_key_state_t state, const keymap_t *key_map,  key_states_t *key_states);
 
 #endif

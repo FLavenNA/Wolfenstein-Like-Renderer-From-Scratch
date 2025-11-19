@@ -12,6 +12,7 @@ void input_init(keymap_t *key_map, key_states_t *key_states)
     key_map->strafe_left = SDL_SCANCODE_Q;
     key_map->strafe_right = SDL_SCANCODE_E;
     key_map->toggle_map = SDL_SCANCODE_M;
+    key_map->pause = SDL_SCANCODE_SPACE;
     key_map->quit = SDL_SCANCODE_ESCAPE;
 
     key_states->forward = false;
@@ -21,6 +22,7 @@ void input_init(keymap_t *key_map, key_states_t *key_states)
     key_states->strafe_left = false;
     key_states->strafe_right = false;
     key_states->map_state = false;
+    key_states->pause = false;
     key_states->quit = false;
 }
 
@@ -51,11 +53,19 @@ void handle_input(engine_t *engine, float delta_time)
                 break;
         }
     }
-    process_key_states(&engine->key_states, &engine->player, delta_time);
+    process_key_states(engine,delta_time);
 }
 
-void process_key_states(const key_states_t *key_states, player_t *player, const float delta_time)
+void process_key_states(engine_t *engine, const float delta_time)
 {
+    key_states_t *key_states = &engine->key_states;
+    if (!key_states)
+        return;
+
+    player_t *player = &engine->player;
+    if (!player)
+        return;
+
     if (key_states->forward)
     {
         player->position.x += MOV_SPEED * cos(player->dir_angle) * delta_time;
@@ -82,6 +92,29 @@ void process_key_states(const key_states_t *key_states, player_t *player, const 
         player->position.x += MOV_SPEED * cos(player->dir_angle + M_PI / 2) * delta_time;
         player->position.y += MOV_SPEED * sin(player->dir_angle + M_PI / 2) * delta_time;
     }
+
+
+    // To prevent it checking it multiple times and check it only frame by frame
+    static bool pause_pressed_last_frame = false;
+
+    // Toggle on key press (rising edge)
+    if (key_states->pause && !pause_pressed_last_frame) {
+        switch (engine->state) {
+            case PAUSED:
+                engine->state = RUNNING;
+                break;
+            case RUNNING:
+                engine->state = PAUSED;
+                break;
+            default:
+                break;
+        }
+    }
+
+    pause_pressed_last_frame = key_states->pause;
+
+    if (key_states->quit)
+        engine->state = QUIT;
 }
 
 void handle_real_time_keys(const SDL_Scancode scan_code, const kdb_key_state_t state, const keymap_t *key_map,  key_states_t *key_states)
@@ -100,4 +133,10 @@ void handle_real_time_keys(const SDL_Scancode scan_code, const kdb_key_state_t s
         key_states->strafe_left = state;
     else if (scan_code == key_map->strafe_right) 
         key_states->strafe_right = state;
+
+
+    if (scan_code == key_map->pause)
+        key_states->pause = state;
+    if (scan_code == key_map->quit)
+        key_states->quit = state;
 }

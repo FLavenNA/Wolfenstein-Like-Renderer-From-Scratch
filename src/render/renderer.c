@@ -7,7 +7,6 @@
 #include  "colors.h"
 
 void render(const engine_t *engine) {
-    // TODO: Do rendering stuff in here
     clear_screen_buffer(&engine->graphics);
     map_draw(&engine->graphics, &engine->map, &engine->player);
     draw_fps_counter(&engine->graphics);
@@ -32,7 +31,7 @@ void update_screen(const graphics_t *graphics) {
 }
 
 void draw_fps_counter(const graphics_t *graphics) {
-    if (!graphics || !graphics->avg_fps || !graphics->font || !graphics->frame_buffer)
+    if (!graphics || !graphics->font || !graphics->frame_buffer)
         return;
 
     char buffer[10];
@@ -49,19 +48,20 @@ void draw_fps_counter(const graphics_t *graphics) {
 
     const int margin = 10;
 
-    int x0 = margin;
-    int y0 = margin;
+    const int x0 = margin;
+    const int y0 = margin;
+    uint32_t *fb = graphics->frame_buffer;
 
     // Draw background rectangle for text surface
     for (int y = 0; y < surface->h; y++) {
-        int yy = y0 + y;
+        const int yy = y0 + y;
         if (yy < 0 || yy >= FRAME_BUFFER_HEIGHT) continue;
 
         for (int x = 0; x < surface->w; x++) {
-            int xx = x0 + x;
+            const int xx = x0 + x;
             if (xx < 0 || xx >= FRAME_BUFFER_WIDTH) continue;
 
-            graphics->frame_buffer[yy * FRAME_BUFFER_WIDTH + xx] = FPS_COUNTER_BG;
+            fb[yy * FRAME_BUFFER_WIDTH + xx] = FPS_COUNTER_BG;
         }
     }
 
@@ -69,50 +69,57 @@ void draw_fps_counter(const graphics_t *graphics) {
 
     // Correct pixel blending using pitch and format
     for (int y = 0; y < surface->h; y++) {
-        int yy = y0 + y;
+        const int yy = y0 + y;
         if (yy < 0 || yy >= FRAME_BUFFER_HEIGHT) continue;
 
         // Pointer to start of the row (use pitch!)
         uint8_t *row = (uint8_t *)surface->pixels + y * surface->pitch;
 
         for (int x = 0; x < surface->w; x++) {
-            int xx = x0 + x;
+            const int xx = x0 + x;
             if (xx < 0 || xx >= FRAME_BUFFER_WIDTH) continue;
 
-            uint32_t *pixel_ptr = (uint32_t *)(row + x * format_details->bytes_per_pixel);
-            uint32_t src_pixel = *pixel_ptr;
+            const uint32_t *pixel_ptr = (uint32_t *)(row + x * format_details->bytes_per_pixel);
+            const uint32_t src_pixel = *pixel_ptr;
 
             uint8_t src_r, src_g, src_b, src_a;
             SDL_GetRGBA(src_pixel, format_details, NULL, &src_r, &src_g, &src_b, &src_a);
             if (src_a == 0) continue;
 
             // Read current background
-            uint32_t *dst = &graphics->frame_buffer[yy * FRAME_BUFFER_WIDTH + xx];
-            uint8_t dst_r = (*dst >> 16) & 0xFF;
-            uint8_t dst_g = (*dst >> 8) & 0xFF;
-            uint8_t dst_b = (*dst) & 0xFF;
+            uint32_t *dst = &fb[yy * FRAME_BUFFER_WIDTH + xx];
+            const uint8_t dst_r = (*dst >> 16) & 0xFF;
+            const uint8_t dst_g = (*dst >> 8) & 0xFF;
+            const uint8_t dst_b = (*dst) & 0xFF;
 
             // Blend in with background
-            float alpha = src_a / 255.0f;
-            uint8_t out_r = (uint8_t)(src_r * alpha + dst_r * (1.0f - alpha));
-            uint8_t out_g = (uint8_t)(src_g * alpha + dst_g * (1.0f - alpha));
-            uint8_t out_b = (uint8_t)(src_b * alpha + dst_b * (1.0f - alpha));
+            const float alpha = (float)src_a / 255.0f;
+            const uint8_t out_r = (uint8_t)((float)src_r * alpha + (float)dst_r * (1.0f - alpha));
+            const uint8_t out_g = (uint8_t)((float)src_g * alpha + (float)dst_g * (1.0f - alpha));
+            const uint8_t out_b = (uint8_t)((float)src_b * alpha + (float)dst_b * (1.0f - alpha));
+            const uint8_t out_a = 255;
 
             // Write to destination
-            *dst = (0xFF << 24) | (out_r << 16) | (out_g << 8) | out_b;
+            *dst = RGBA_TO_ABGR_COLOR(out_r, out_g, out_b, out_a);
         }
     }
 
     SDL_DestroySurface(surface);
 }
 
-void SDL_RenderFillCircleF(SDL_Renderer *renderer, float cx, float cy, float radius) {
-    for (int w = 0; w < radius * 2; w++) {
-        for (int h = 0; h < radius * 2; h++) {
-            float dx = radius - w;
-            float dy = radius - h;
-            if (dx * dx + dy * dy <= radius * radius) {
-                SDL_RenderPoint(renderer, cx + dx, cy + dy);
+void draw_filled_circle(uint32_t *fb, const int frame_buffer_width, const int frame_buffer_height, const int circle_x, const int circle_y, const int radius, const uint32_t color) {
+    const int radius2 = radius * radius;
+
+    for (int dy = -radius; dy <= radius; dy++) {
+        const int y = circle_y + dy;
+        if (y < 0 || y >= frame_buffer_height) continue;
+
+        for (int dx = -radius; dx <= radius; dx++) {
+            const int x = circle_x + dx;
+            if (x < 0 || x >= frame_buffer_width) continue;
+
+            if (dx*dx + dy*dy <= radius2) {
+                fb[y * frame_buffer_width + x] = color;
             }
         }
     }

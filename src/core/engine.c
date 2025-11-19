@@ -26,11 +26,14 @@ void engine_run(engine_t *engine)
 
     while(engine->state != QUIT) {
         uint64_t current_counter = SDL_GetPerformanceCounter();
-        float delta_time = (float)((current_counter - last_counter) * 1000.0)
+        delta_time = (float)((current_counter - last_counter) * 1000.0)
                            / SDL_GetPerformanceFrequency();
         last_counter = current_counter;
 
         handle_input(engine, delta_time);
+
+        if(engine->state == PAUSED) continue;
+
         render(engine);
 
         // Frame pacing
@@ -41,7 +44,7 @@ void engine_run(engine_t *engine)
         // Delay just enough to hit 60 fps
         if (frame_elapsed < frame_time)
         {
-            SDL_Delay((Uint32)(frame_time - frame_elapsed));
+            SDL_Delay((uint32_t)(frame_time - frame_elapsed));
         }
 
         fps_timer += delta_time;

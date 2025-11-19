@@ -45,6 +45,7 @@ bool graphics_init(graphics_t *graphics) {
         return false;
 
     graphics->frame_buffer = malloc(FRAME_BUFFER_WIDTH * FRAME_BUFFER_HEIGHT * sizeof(uint32_t));
+
     if (!graphics->frame_buffer)
         return false;
 

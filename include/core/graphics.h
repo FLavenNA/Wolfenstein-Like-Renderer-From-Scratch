@@ -28,6 +28,6 @@ struct graphics {
 
 bool graphics_init(graphics_t *graphics);
 void graphics_cleanup(graphics_t *graphics);
-void graphics_resize(graphics_t *graphics, const int width, const int height);
+void graphics_resize(graphics_t *graphics, int width, int height);
 
 #endif

@@ -12,6 +12,6 @@ void update_screen(const graphics_t *graphics);
 void draw_fps_counter(const graphics_t *graphics);
 
 // Helper function
-void draw_filled_circle(uint32_t *frame_buffer, int frame_buffer_width, int frame_buffer_height, int circle_x, int circle_y, int radius, uint32_t color);
+void draw_filled_circle(uint32_t *fb, int frame_buffer_width, int frame_buffer_height, int circle_x, int circle_y, int radius, uint32_t color);
 
 #endif

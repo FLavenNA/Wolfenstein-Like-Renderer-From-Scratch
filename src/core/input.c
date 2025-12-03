@@ -66,34 +66,7 @@ void process_key_states(engine_t *engine, const float delta_time)
     if (!player)
         return;
 
-    if (key_states->forward)
-    {
-        player->position.x += MOV_SPEED * cos(player->dir_angle) * delta_time;
-        player->position.y += MOV_SPEED * sin(player->dir_angle) * delta_time;
-    }
-    else if (key_states->backward)
-    {
-        player->position.x -= MOV_SPEED * cos(player->dir_angle) * delta_time;
-        player->position.y -= MOV_SPEED * sin(player->dir_angle) * delta_time;
-    }
-
-    if (key_states->left)
-        player->dir_angle -= ROT_SPEED * delta_time;
-    else if (key_states->right)
-        player->dir_angle += ROT_SPEED * delta_time;
-
-    if (key_states->strafe_left)
-    {
-        player->position.x -= MOV_SPEED * cos(player->dir_angle + M_PI / 2) * delta_time;
-        player->position.y -= MOV_SPEED * sin(player->dir_angle + M_PI / 2) * delta_time;
-    }
-    else if (key_states->strafe_right)
-    {
-        player->position.x += MOV_SPEED * cos(player->dir_angle + M_PI / 2) * delta_time;
-        player->position.y += MOV_SPEED * sin(player->dir_angle + M_PI / 2) * delta_time;
-    }
-
-
+    update_player_position(player, key_states, delta_time);
     // To prevent it checking it multiple times and check it only frame by frame
     static bool pause_pressed_last_frame = false;
 

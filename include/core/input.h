@@ -5,9 +5,6 @@
 
 #include "type_defs.h"
 
-#define MOV_SPEED (4.0f / 1000.0f) // In ms so we divide it by 1000
-#define ROT_SPEED (4.0f / 1000.0f) // In ms so we divide it by 1000
-
 struct keymap {
     SDL_Scancode left;
     SDL_Scancode right;

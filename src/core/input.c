@@ -69,6 +69,7 @@ void process_key_states(engine_t *engine, const float delta_time)
     update_player_position(player, key_states, delta_time);
     // To prevent it checking it multiple times and check it only frame by frame
     static bool pause_pressed_last_frame = false;
+    static bool map_pressed_last_frame = false;
 
     // Toggle on key press (rising edge)
     if (key_states->pause && !pause_pressed_last_frame) {
@@ -84,10 +85,17 @@ void process_key_states(engine_t *engine, const float delta_time)
         }
     }
 
-    pause_pressed_last_frame = key_states->pause;
+    // --- Map toggle ---
+    if (key_states->map_state && !map_pressed_last_frame)
+    {
+        engine->map.isVisible = !engine->map.isVisible;
+    }
 
     if (key_states->quit)
         engine->state = QUIT;
+
+    pause_pressed_last_frame = key_states->pause;
+    map_pressed_last_frame = key_states->map_state;
 }
 
 void handle_real_time_keys(const SDL_Scancode scan_code, const kdb_key_state_t state, const keymap_t *key_map,  key_states_t *key_states)
@@ -107,6 +115,8 @@ void handle_real_time_keys(const SDL_Scancode scan_code, const kdb_key_state_t s
     else if (scan_code == key_map->strafe_right) 
         key_states->strafe_right = state;
 
+    if (scan_code == key_map->toggle_map)
+        key_states->map_state = state;
 
     if (scan_code == key_map->pause)
         key_states->pause = state;

@@ -11,6 +11,7 @@
 
 struct map {
     int32_t data[MAP_HEIGHT] [MAP_WIDTH];
+    bool isVisible;
 };
 
 void map_init(map_t *map);

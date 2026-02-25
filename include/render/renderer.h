@@ -3,7 +3,6 @@
 
 #include <SDL3/SDL.h>
 
-#include "u_math.h"
 #include "type_defs.h"
 
 void render(const engine_t *engine);

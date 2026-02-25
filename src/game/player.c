@@ -39,7 +39,6 @@ void update_player_position(player_t *player, const key_states_t *key_states, co
     }
 }
 
-
 void draw_minimap_player(uint32_t *frame_buffer, const int frame_buffer_width, const int frame_buffer_height, const player_t *player, const int offset_x, const int offset_y, const float tile_size) {
     // Convert world → minimap pixel coordinates
     const int px = (int)(offset_x + player->position.x * tile_size + tile_size * 0.5f);

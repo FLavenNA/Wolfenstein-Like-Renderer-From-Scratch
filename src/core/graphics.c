@@ -64,16 +64,24 @@ bool graphics_init(graphics_t *graphics) {
 void graphics_cleanup(graphics_t *graphics) {
     if (graphics->frame_buffer)
         free(graphics->frame_buffer);
+
     graphics->frame_buffer = NULL;
 
     if (graphics->window)
         SDL_DestroyWindow(graphics->window);
 
+    graphics->window = NULL;
+
     if (graphics->renderer)
         SDL_DestroyRenderer(graphics->renderer);
 
+    graphics->renderer = NULL;
+
     if (graphics->texture)
         SDL_DestroyTexture(graphics->texture);
+
+    graphics->texture = NULL;
+
     TTF_Quit();
     SDL_Quit();
 }

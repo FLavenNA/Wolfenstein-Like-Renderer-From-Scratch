@@ -8,7 +8,7 @@
 void map_init(map_t *map)
 {
     // Simple rectangular room
-    int layout[MAP_HEIGHT][MAP_WIDTH] = {
+    static const int layout[MAP_HEIGHT][MAP_WIDTH] = {
         {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
         {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
         {1,0,0,1,1,0,0,0,0,0,1,1,0,0,0,1},
@@ -26,11 +26,16 @@ void map_init(map_t *map)
     for (int y = 0; y < MAP_HEIGHT; ++y)
         for (int x = 0; x < MAP_WIDTH; ++x)
             map->data[y][x] = layout[y][x];
+
+    map->isVisible = true;
 }
 
 void map_draw(const graphics_t *graphics, const map_t *map, const player_t *player)
 {
     if (!graphics || !graphics->frame_buffer || !map)
+        return;
+
+    if (!map->isVisible)
         return;
 
     const int margin = 10;
@@ -80,6 +85,4 @@ void map_draw(const graphics_t *graphics, const map_t *map, const player_t *play
 
     if (player)
         draw_minimap_player(fb, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, player, x0, y0, TILE_SIZE);
-
-    // TODO: Implement software rendering for player on map
 }

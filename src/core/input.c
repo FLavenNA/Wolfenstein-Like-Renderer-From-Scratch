@@ -1,8 +1,6 @@
 #include "input.h"
 #include "engine.h"
 
-#include <stdio.h>
-
 void input_init(keymap_t *key_map, key_states_t *key_states)
 {
     key_map->forward = SDL_SCANCODE_W;

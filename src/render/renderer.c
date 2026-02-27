@@ -3,13 +3,15 @@
 #include "renderer.h"
 #include "graphics.h"
 #include "engine.h"
-#include "map.h"
-#include  "colors.h"
+#include "colors.h"
+#include "map_renderer.h"
 
 void render(const engine_t *engine) {
     clear_screen_buffer(&engine->graphics);
-    map_draw(&engine->graphics, &engine->map, &engine->player);
+
+    draw_map(&engine->graphics, &engine->map, &engine->player);
     draw_fps_counter(&engine->graphics);
+
     update_screen(&engine->graphics);
 }
 
@@ -105,22 +107,4 @@ void draw_fps_counter(const graphics_t *graphics) {
     }
 
     SDL_DestroySurface(surface);
-}
-
-void draw_filled_circle(uint32_t *fb, const int frame_buffer_width, const int frame_buffer_height, const int circle_x, const int circle_y, const int radius, const uint32_t color) {
-    const int radius2 = radius * radius;
-
-    for (int dy = -radius; dy <= radius; dy++) {
-        const int y = circle_y + dy;
-        if (y < 0 || y >= frame_buffer_height) continue;
-
-        for (int dx = -radius; dx <= radius; dx++) {
-            const int x = circle_x + dx;
-            if (x < 0 || x >= frame_buffer_width) continue;
-
-            if (dx*dx + dy*dy <= radius2) {
-                fb[y * frame_buffer_width + x] = color;
-            }
-        }
-    }
 }

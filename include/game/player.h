@@ -4,8 +4,8 @@
 #include "u_math.h"
 #include "type_defs.h"
 
-#define MOV_SPEED (4.0f / 1000.0f) // In ms so we divide it by 1000
-#define ROT_SPEED (4.0f / 1000.0f) // In ms so we divide it by 1000
+#define MOV_SPEED (2.0f / 1000.0f) // In ms so we divide it by 1000
+#define ROT_SPEED (2.0f / 1000.0f) // In ms so we divide it by 1000
 
 struct player {
     vec2_t position;

@@ -6,10 +6,10 @@
 
 #include "type_defs.h"
 
-#define WINDOW_WIDTH            1280
-#define WINDOW_HEIGHT           720
-#define FRAME_BUFFER_WIDTH      1280
-#define FRAME_BUFFER_HEIGHT     720
+#define WINDOW_WIDTH            1920
+#define WINDOW_HEIGHT           1080
+#define FRAME_BUFFER_WIDTH      1920
+#define FRAME_BUFFER_HEIGHT     1080
 #define MIN_WINDOW_WIDTH        640
 #define MIN_WINDOW_HEIGHT       380
 #define TARGET_FPS              60

@@ -73,22 +73,24 @@ void draw_minimap_player(uint32_t *frame_buffer, const int frame_buffer_width, c
     // 🔥 Direction line
     const float dir_length = tile_size * 0.75f;
 
-    const int dir_x = (int)(px + cosf(player->dir_angle) * dir_length);
-    const int dir_y = (int)(py + sinf(player->dir_angle) * dir_length);
+    const int dir_x = (int)(px + player->dir.x * dir_length);
+    const int dir_y = (int)(py + player->dir.y * dir_length);
 
-    const float half_fov = FOV * 0.5f;
 
     // FOV Lines
-    const float left_angle  = player->dir_angle - half_fov;
-    const float right_angle = player->dir_angle + half_fov;
-
     const float fov_length = tile_size * 1.5f;
 
-    const int left_fov_x  = (int)(px + cosf(left_angle)  * fov_length);
-    const int left_fov_y  = (int)(py + sinf(left_angle)  * fov_length);
+    const float left_vec_x  = player->dir.x - player->plane.x;
+    const float left_vec_y  = player->dir.y - player->plane.y;
 
-    const int right_fov_x = (int)(px + cosf(right_angle) * fov_length);
-    const int right_fov_y = (int)(py + sinf(right_angle) * fov_length);
+    const float right_vec_x = player->dir.x + player->plane.x;
+    const float right_vec_y = player->dir.y + player->plane.y;
+
+    const int left_fov_x  = (int)(px + left_vec_x * fov_length);
+    const int left_fov_y  = (int)(py + left_vec_y * fov_length);
+
+    const int right_fov_x = (int)(px + right_vec_x * fov_length);
+    const int right_fov_y = (int)(py + right_vec_y * fov_length);
 
     // Draw the player (yellow)
     draw_filled_circle(frame_buffer, frame_buffer_width, frame_buffer_height, px, py, radius, MINI_MAP_PLAYER_COLOR);

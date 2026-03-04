@@ -17,5 +17,7 @@
 // World colors
 #define WALL_DARK_COLOR         RGBA_TO_ABGR_COLOR(64,64,64,255)
 #define WALL_COLOR              RGBA_TO_ABGR_COLOR(220,220,220,255)
+#define FLOOR_COLOR             RGBA_TO_ABGR_COLOR(95,75,60, 255)
+#define CEILING_COLOR           RGBA_TO_ABGR_COLOR(110, 140, 190, 255)
 
 #endif

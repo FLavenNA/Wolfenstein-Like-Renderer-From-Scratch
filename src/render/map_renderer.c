@@ -76,22 +76,6 @@ void draw_minimap_player(uint32_t *frame_buffer, const int frame_buffer_width, c
     const int dir_x = (int)(px + player->dir.x * dir_length);
     const int dir_y = (int)(py + player->dir.y * dir_length);
 
-
-    // FOV Lines
-    const float fov_length = tile_size * 1.5f;
-
-    const float left_vec_x  = player->dir.x - player->plane.x;
-    const float left_vec_y  = player->dir.y - player->plane.y;
-
-    const float right_vec_x = player->dir.x + player->plane.x;
-    const float right_vec_y = player->dir.y + player->plane.y;
-
-    const int left_fov_x  = (int)(px + left_vec_x * fov_length);
-    const int left_fov_y  = (int)(py + left_vec_y * fov_length);
-
-    const int right_fov_x = (int)(px + right_vec_x * fov_length);
-    const int right_fov_y = (int)(py + right_vec_y * fov_length);
-
     // Draw the player (yellow)
     draw_filled_circle(frame_buffer, frame_buffer_width, frame_buffer_height, px, py, radius, MINI_MAP_PLAYER_COLOR);
 
@@ -105,10 +89,4 @@ void draw_minimap_player(uint32_t *frame_buffer, const int frame_buffer_width, c
           dir_y,
           MINI_MAP_PLAYER_COLOR);
 
-    // Draw FOV lines
-    draw_line(frame_buffer, frame_buffer_width, frame_buffer_height,
-              px, py, left_fov_x, left_fov_y, MINI_MAP_FOV_LINE_COLOR);
-
-    draw_line(frame_buffer, frame_buffer_width, frame_buffer_height,
-              px, py, right_fov_x, right_fov_y, MINI_MAP_FOV_LINE_COLOR);
 }

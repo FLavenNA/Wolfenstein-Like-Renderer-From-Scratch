@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include "primitive_renderer.h"
+#include "graphics.h"
 
 void draw_filled_circle(uint32_t *fb, const int frame_buffer_width, const int frame_buffer_height, const int circle_x, const int circle_y, const int radius, const uint32_t color) {
     const int radius2 = radius * radius;
@@ -49,4 +50,12 @@ void draw_line(uint32_t *fb, int frame_buffer_width, int frame_buffer_height, in
             y0 += sy;
         }
     }
+}
+
+void put_pixel(uint32_t *fb, int x, int y, uint32_t color) {
+
+    if (x < 0 || x >= FRAME_BUFFER_WIDTH || y < 0 || y >= FRAME_BUFFER_HEIGHT)
+        return;
+
+    fb[y * FRAME_BUFFER_WIDTH + x] = color;
 }

@@ -13,5 +13,6 @@ struct map {
 };
 
 void map_init(map_t *map);
+bool map_is_wall(const map_t *map, int x, int y);
 
 #endif

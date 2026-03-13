@@ -6,6 +6,7 @@
 #include "map.h"
 #include "player.h"
 #include "input.h"
+#include "time.h"
 
 typedef enum engine_state
 {
@@ -16,12 +17,13 @@ typedef enum engine_state
 
 struct engine 
 {
-    engine_state_t state;
-    graphics_t graphics;
-    map_t map;
-    player_t player;
-    keymap_t key_map;
-    key_states_t key_states;
+    engine_state_t state;       // State of the engine
+    graphics_t graphics;        // SDL Graphics related things
+    map_t map;                  // Basic 2D map
+    player_t player;            // Player
+    keymap_t key_map;           // Key map and key codes
+    key_states_t key_states;    // Key states Up-Down
+    etime_t time;               // Time related things for engine
 };
 
 bool engine_init(engine_t *engine);

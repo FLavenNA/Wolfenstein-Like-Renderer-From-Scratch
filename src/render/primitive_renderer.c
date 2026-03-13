@@ -21,12 +21,13 @@ void draw_filled_circle(uint32_t *fb, const int frame_buffer_width, const int fr
     }
 }
 
-void draw_line(uint32_t *fb, int frame_buffer_width, int frame_buffer_height, int x0, int y0, int x1, int y1, uint32_t color)
+void draw_line(uint32_t *fb, const int frame_buffer_width, const int frame_buffer_height, int x0,
+                int y0, const int x1, const int y1, const uint32_t color)
 {
-    int dx = abs(x1 - x0);
-    int dy = -abs(y1 - y0);
-    int sx = x0 < x1 ? 1 : -1;
-    int sy = y0 < y1 ? 1 : -1;
+    const int dx = abs(x1 - x0);
+    const int dy = -abs(y1 - y0);
+    const int sx = x0 < x1 ? 1 : -1;
+    const int sy = y0 < y1 ? 1 : -1;
     int err = dx + dy;
 
     while (1)
@@ -37,7 +38,7 @@ void draw_line(uint32_t *fb, int frame_buffer_width, int frame_buffer_height, in
         if (x0 == x1 && y0 == y1)
             break;
 
-        int e2 = 2 * err;
+        const int e2 = 2 * err;
 
         if (e2 >= dy)
         {
@@ -52,7 +53,7 @@ void draw_line(uint32_t *fb, int frame_buffer_width, int frame_buffer_height, in
     }
 }
 
-void put_pixel(uint32_t *fb, int x, int y, uint32_t color) {
+void put_pixel(uint32_t *fb, const int x, const int y, const uint32_t color) {
 
     if (x < 0 || x >= FRAME_BUFFER_WIDTH || y < 0 || y >= FRAME_BUFFER_HEIGHT)
         return;

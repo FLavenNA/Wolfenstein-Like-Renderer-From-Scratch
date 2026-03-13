@@ -8,15 +8,15 @@
 #include "player.h"
 #include "primitive_renderer.h"
 
-void raycast(const graphics_t *graphics, player_t *player, const map_t *map) {
+void raycast(const graphics_t *graphics, const player_t *player, const map_t *map) {
     for (int x = 0; x < FRAME_BUFFER_WIDTH; x++)
         shoot_one_ray(graphics, player, map, x);
 }
 
-void shoot_one_ray(const graphics_t *graphics, player_t *player, const map_t *map, int x) {
+void shoot_one_ray(const graphics_t *graphics, const player_t *player, const map_t *map, int x) {
 
     // 1. Camera space x-coordinate (-1 to 1)
-    double cameraX = 2.0 * x / (double)FRAME_BUFFER_WIDTH - 1.0;
+    const double cameraX = 2.0 * x / (double)FRAME_BUFFER_WIDTH - 1.0;
 
     // 2. Ray direction
     vec2_t rayDir;
@@ -96,11 +96,11 @@ void shoot_one_ray(const graphics_t *graphics, player_t *player, const map_t *ma
         perpWallDist = (mapY - player->position.y + (1 - stepY) / 2.0) / rayDir.y;
 
     // 7. Calculate line height
-    int lineHeight = (int)(FRAME_BUFFER_HEIGHT / perpWallDist);
+    const int lineHeight = (int)(FRAME_BUFFER_HEIGHT / perpWallDist);
 
     // 8. Determine start and end of wall
-    int y0 = -lineHeight / 2 + FRAME_BUFFER_HEIGHT / 2;
-    int y1 = lineHeight / 2 + FRAME_BUFFER_HEIGHT / 2;
+    const int y0 = -lineHeight / 2 + FRAME_BUFFER_HEIGHT / 2;
+    const int y1 = lineHeight / 2 + FRAME_BUFFER_HEIGHT / 2;
 
     // 9. Draw Ceiling
     for (int y = 0; y < y1; y++)

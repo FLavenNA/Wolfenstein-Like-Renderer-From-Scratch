@@ -9,6 +9,7 @@ typedef struct graphics graphics_t;
 typedef struct engine engine_t;
 typedef struct keymap keymap_t;
 typedef struct key_states key_states_t;
+typedef struct time etime_t;
 
 // Render type defs
 

@@ -88,5 +88,4 @@ void draw_minimap_player(uint32_t *frame_buffer, const int frame_buffer_width, c
           dir_x,
           dir_y,
           MINI_MAP_PLAYER_COLOR);
-
 }

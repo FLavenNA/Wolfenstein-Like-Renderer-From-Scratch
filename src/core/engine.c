@@ -9,6 +9,7 @@ bool engine_init(engine_t *engine)
     input_init(&engine->key_map, &engine->key_states);
     player_init(&engine->player, 1.5, 1.5, M_PI / 2);
     map_init(&engine->map);
+    time_init(&engine->time);
 
     engine->state = RUNNING;
     return true;
@@ -16,47 +17,24 @@ bool engine_init(engine_t *engine)
 
 void engine_run(engine_t *engine)
 {
-    const float frame_time = 1000.0f / TARGET_FPS;
-    float fps_timer = 0.0f;
-    int frame_count = 0;
-    float fps = 0.0f;
-    float delta_time = 0.0f;
-
-    uint64_t last_counter = SDL_GetPerformanceCounter();
-
     while(engine->state != QUIT) {
-        uint64_t current_counter = SDL_GetPerformanceCounter();
-        delta_time = (float)((current_counter - last_counter) * 1000.0)
-                           / SDL_GetPerformanceFrequency();
-        last_counter = current_counter;
+        const uint64_t frame_start = SDL_GetPerformanceCounter();
 
-        handle_input(engine, delta_time);
+        time_update(&engine->time, &engine->graphics);
 
-        if(engine->state == PAUSED) continue;
+        const float dt = time_delta(&engine->time);
+
+        handle_input(engine, dt);
+
+        if(engine->state == PAUSED) {
+            SDL_Delay(10);      // To prevent over usage when its paused
+            continue;
+        }
 
         render(engine);
 
-        // Frame pacing
-        uint64_t frame_end = SDL_GetPerformanceCounter();
-        float frame_elapsed = (float)((frame_end - current_counter) * 1000.0)
-                              / SDL_GetPerformanceFrequency();
-
-        // Delay just enough to hit 60 fps
-        if (frame_elapsed < frame_time)
-        {
-            SDL_Delay((uint32_t)(frame_time - frame_elapsed));
-        }
-
-        fps_timer += delta_time;
-        frame_count++;
-
-        if (fps_timer >= 1000.0f)
-        {
-            fps = (float)frame_count * (1000.0f / fps_timer);
-            frame_count = 0;
-            fps_timer = 0.0f;
-            engine->graphics.avg_fps = fps;
-        }
+        // Limit FPS to target FPS
+        graphics_frame_pace(frame_start, engine->time.perf_freq);
     }
 }
 

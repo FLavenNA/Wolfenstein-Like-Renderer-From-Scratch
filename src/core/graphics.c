@@ -93,3 +93,19 @@ void graphics_resize(graphics_t *graphics, const int width, const int height) {
     graphics->window_width = width;
     graphics->window_height = height;
 }
+
+void graphics_frame_pace(const uint64_t frame_start,const uint64_t perf_freq)
+{
+    const double target_time = 1.0 / TARGET_FPS;
+
+    const uint64_t frame_end = SDL_GetPerformanceCounter();
+
+    const double elapsed =
+        (double)(frame_end - frame_start) / (double)perf_freq;
+
+    if (elapsed < target_time)
+    {
+        const double delay = (target_time - elapsed) * 1000.0;
+        SDL_Delay((uint32_t)delay);
+    }
+}

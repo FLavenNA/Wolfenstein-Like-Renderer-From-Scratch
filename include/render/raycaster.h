@@ -8,7 +8,7 @@ struct ray_hit {
     double hit_y;
 };
 
-void raycast(const graphics_t *graphics, player_t *player, const map_t *map);
-void shoot_one_ray(const graphics_t *graphics, player_t *player, const map_t *map, int x);
+void raycast(const graphics_t *graphics, const player_t *player, const map_t *map);
+void shoot_one_ray(const graphics_t *graphics, const player_t *player, const map_t *map, int x);
 
 #endif

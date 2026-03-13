@@ -108,7 +108,7 @@ void shoot_one_ray(const graphics_t *graphics, const player_t *player, const map
 
     // 10. Draw Wall
     for (int y = y0; y <= y1; y++)
-        put_pixel(graphics->frame_buffer, x, y, WALL_COLOR);
+        put_pixel(graphics->frame_buffer, x, y, side == 0 ? WALL_DARK_COLOR : WALL_COLOR);
 
     // 11. Draw Floor
     for (int y = y1 + 1; y < FRAME_BUFFER_HEIGHT; y++)

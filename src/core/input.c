@@ -61,10 +61,12 @@ void process_key_states(engine_t *engine, const float delta_time)
         return;
 
     player_t *player = &engine->player;
-    if (!player)
+    map_t *map = &engine->map;
+
+    if (!player || !map)
         return;
 
-    update_player_position(player, key_states, delta_time);
+    update_player_position(map, player, key_states, delta_time);
     // To prevent it checking it multiple times and check it only frame by frame
     static bool pause_pressed_last_frame = false;
     static bool map_pressed_last_frame = false;

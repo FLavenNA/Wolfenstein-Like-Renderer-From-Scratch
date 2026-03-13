@@ -1,5 +1,6 @@
 #include "player.h"
 #include "input.h"
+#include "map.h"
 
 void player_init(player_t *player, const double x, const double y, const double angle)
 {
@@ -12,34 +13,56 @@ void player_init(player_t *player, const double x, const double y, const double 
     player->plane.x = -player->dir.y * PLANE_LEN;
     player->plane.y =  player->dir.x * PLANE_LEN;
 }
+void update_player_position(const map_t *map, player_t *player, const key_states_t *key_states, const float delta_time) {
+    double move_x = 0.0;
+    double move_y = 0.0;
 
-void update_player_position(player_t *player, const key_states_t *key_states, const float delta_time) {
     if (key_states->forward)
     {
-        player->position.x += MOV_SPEED * player->dir.x * delta_time;
-        player->position.y += MOV_SPEED * player->dir.y * delta_time;
+        move_x += player->dir.x;
+        move_y += player->dir.y;
     }
-    else if (key_states->backward)
+
+    if (key_states->backward)
     {
-        player->position.x -= MOV_SPEED * player->dir.x * delta_time;
-        player->position.y -= MOV_SPEED * player->dir.y * delta_time;
+        move_x -= player->dir.x;
+        move_y -= player->dir.y;
+    }
+
+    if (key_states->strafe_right)
+    {
+        move_x += player->plane.x;
+        move_y += player->plane.y;
+    }
+
+    if (key_states->strafe_left)
+    {
+        move_x -= player->plane.x;
+        move_y -= player->plane.y;
+    }
+
+    const double new_x = player->position.x + move_x * MOV_SPEED * delta_time;;
+    const double new_y = player->position.y + move_y * MOV_SPEED * delta_time;
+
+    // X collision
+    if (!map_is_wall(map, (int)(new_x + PLAYER_RADIUS), (int)player->position.y) &&
+        !map_is_wall(map, (int)(new_x - PLAYER_RADIUS), (int)player->position.y))
+    {
+        player->position.x = new_x;
+    }
+
+    // Y collision
+    if (!map_is_wall(map, (int)player->position.x, (int)(new_y + PLAYER_RADIUS)) &&
+        !map_is_wall(map, (int)player->position.x, (int)(new_y - PLAYER_RADIUS)))
+    {
+        player->position.y = new_y;
     }
 
     if (key_states->left)
         rotate_player(player, -ROT_SPEED * delta_time);
-    else if (key_states->right)
-        rotate_player(player, ROT_SPEED * delta_time);
 
-    if (key_states->strafe_right)
-    {
-        player->position.x += player->plane.x * MOV_SPEED * delta_time;
-        player->position.y += player->plane.y * MOV_SPEED * delta_time;
-    }
-    if (key_states->strafe_left)
-    {
-        player->position.x -= player->plane.x * MOV_SPEED * delta_time;
-        player->position.y -= player->plane.y * MOV_SPEED * delta_time;
-    }
+    if (key_states->right)
+        rotate_player(player, ROT_SPEED * delta_time);
 }
 
 void rotate_player(player_t *player, const double angle)

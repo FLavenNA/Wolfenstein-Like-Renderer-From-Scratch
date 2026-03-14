@@ -99,18 +99,23 @@ void shoot_one_ray(const graphics_t *graphics, const player_t *player, const map
     const int lineHeight = (int)(FRAME_BUFFER_HEIGHT / perpWallDist);
 
     // 8. Determine start and end of wall
-    const int y0 = -lineHeight / 2 + FRAME_BUFFER_HEIGHT / 2;
-    const int y1 = lineHeight / 2 + FRAME_BUFFER_HEIGHT / 2;
+    int drawStart = -lineHeight / 2 + FRAME_BUFFER_HEIGHT / 2;
+    if (drawStart < 0)
+        drawStart = 0;
+
+    int drawEnd = lineHeight / 2 + FRAME_BUFFER_HEIGHT / 2;
+    if (drawEnd >= FRAME_BUFFER_HEIGHT)
+        drawEnd = FRAME_BUFFER_HEIGHT - 1;
 
     // 9. Draw Ceiling
-    for (int y = 0; y < y1; y++)
+    for (int y = 0; y < drawStart; y++)
         put_pixel(graphics->frame_buffer, x, y, CEILING_COLOR);
 
     // 10. Draw Wall
-    for (int y = y0; y <= y1; y++)
+    for (int y = drawStart; y <= drawEnd; y++)
         put_pixel(graphics->frame_buffer, x, y, side == 0 ? WALL_DARK_COLOR : WALL_COLOR);
 
     // 11. Draw Floor
-    for (int y = y1 + 1; y < FRAME_BUFFER_HEIGHT; y++)
+    for (int y = drawEnd + 1; y < FRAME_BUFFER_HEIGHT; y++)
         put_pixel(graphics->frame_buffer, x, y, FLOOR_COLOR);
 }

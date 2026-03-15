@@ -12,6 +12,7 @@ typedef struct key_states key_states_t;
 typedef struct time etime_t;
 
 // Render type defs
+typedef struct raycaster raycaster_t;
 
 // Utils type defs
 typedef struct vec2 vec2_t;

@@ -10,6 +10,7 @@ bool engine_init(engine_t *engine)
     player_init(&engine->player, 1.5, 1.5, M_PI / 2);
     map_init(&engine->map);
     time_init(&engine->time);
+    init_camera_table(&engine->raycaster);
 
     engine->state = RUNNING;
     return true;

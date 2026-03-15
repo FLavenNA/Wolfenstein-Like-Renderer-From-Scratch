@@ -7,16 +7,23 @@
 #include "map.h"
 #include "player.h"
 #include "primitive_renderer.h"
+#include "renderer.h"
 
-void raycast(const graphics_t *graphics, const player_t *player, const map_t *map) {
-    for (int x = 0; x < FRAME_BUFFER_WIDTH; x++)
-        shoot_one_ray(graphics, player, map, x);
+void init_camera_table(raycaster_t *raycaster) {
+    for (int x = 0; x < FRAME_BUFFER_WIDTH; x++) {
+        raycaster->camera_x_table[x] = 2.0 * x / (double)FRAME_BUFFER_WIDTH - 1.0;
+    }
 }
 
-void shoot_one_ray(const graphics_t *graphics, const player_t *player, const map_t *map, int x) {
+void raycast(const graphics_t *graphics, const raycaster_t *raycaster, const player_t *player, const map_t *map) {
+    for (int x = 0; x < FRAME_BUFFER_WIDTH; x++)
+        shoot_one_ray(graphics, raycaster, player, map, x);
+}
+
+void shoot_one_ray(const graphics_t *graphics, const raycaster_t *raycaster, const player_t *player, const map_t *map, const int x) {
 
     // 1. Camera space x-coordinate (-1 to 1)
-    const double cameraX = 2.0 * x / (double)FRAME_BUFFER_WIDTH - 1.0;
+    const double cameraX = raycaster->camera_x_table[x];
 
     // 2. Ray direction
     vec2_t rayDir;

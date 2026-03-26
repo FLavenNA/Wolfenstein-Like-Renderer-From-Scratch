@@ -64,11 +64,11 @@ void draw_map(const graphics_t *graphics, const map_t *map, const player_t *play
 
 void draw_minimap_player(uint32_t *frame_buffer, const int frame_buffer_width, const int frame_buffer_height, const player_t *player, const int offset_x, const int offset_y, const float tile_size) {
     // Convert world → minimap pixel coordinates
-    const int px = (int)(offset_x + player->position.x * tile_size + tile_size * 0.5f);
-    const int py = (int)(offset_y + player->position.y * tile_size + tile_size * 0.5f);
+    const int px = (int)(offset_x + player->position.x * tile_size);
+    const int py = (int)(offset_y + player->position.y * tile_size);
 
     // Player dot radius
-    const int radius = (int)(tile_size * 0.25f);
+    const int radius = (int)(PLAYER_RADIUS * tile_size);
 
     // 🔥 Direction line
     const float dir_length = tile_size * 0.75f;

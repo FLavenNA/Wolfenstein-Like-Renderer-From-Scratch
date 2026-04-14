@@ -11,6 +11,7 @@ bool engine_init(engine_t *engine)
     map_init(&engine->map);
     time_init(&engine->time);
     init_camera_table(&engine->raycaster);
+    init_raycast_hits(&engine->raycaster);
 
     engine->state = RUNNING;
     return true;

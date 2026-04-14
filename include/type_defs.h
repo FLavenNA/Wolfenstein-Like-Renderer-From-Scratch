@@ -13,6 +13,7 @@ typedef struct time etime_t;
 
 // Render type defs
 typedef struct raycaster raycaster_t;
+typedef struct ray_hit ray_hit_t;
 
 // Utils type defs
 typedef struct vec2 vec2_t;

@@ -1,17 +1,23 @@
 #include <stdlib.h>
+#include  <stdio.h>
 
-#include "raycaster.h"
 
 #include "colors.h"
 #include "graphics.h"
 #include "map.h"
 #include "player.h"
 #include "primitive_renderer.h"
-#include "renderer.h"
 
 void init_camera_table(raycaster_t *raycaster) {
     for (int x = 0; x < FRAME_BUFFER_WIDTH; x++) {
-        raycaster->camera_x_table[x] = 2.0 * x / (double)FRAME_BUFFER_WIDTH - 1.0;
+        raycaster->camera_x_table[x] = 2.0 * x / (double) FRAME_BUFFER_WIDTH - 1.0;
+    }
+}
+
+void init_raycast_hits(raycaster_t *raycaster) {
+    for (int x = 0; x < FRAME_BUFFER_WIDTH; x++) {
+        raycaster->ray_hits[x].hit_x = 0;
+        raycaster->ray_hits[x].hit_y = 0;
     }
 }
 
@@ -20,8 +26,8 @@ void raycast(const graphics_t *graphics, const raycaster_t *raycaster, const pla
         shoot_one_ray(graphics, raycaster, player, map, x);
 }
 
-void shoot_one_ray(const graphics_t *graphics, const raycaster_t *raycaster, const player_t *player, const map_t *map, const int x) {
-
+void shoot_one_ray(const graphics_t *graphics, raycaster_t *raycaster, const player_t *player, const map_t *map,
+                   const int x) {
     // 1. Camera space x-coordinate (-1 to 1)
     const double cameraX = raycaster->camera_x_table[x];
 
@@ -31,8 +37,8 @@ void shoot_one_ray(const graphics_t *graphics, const raycaster_t *raycaster, con
     rayDir.y = player->dir.y + player->plane.y * cameraX;
 
     // 3. Current map square
-    int mapX = (int)player->position.x;
-    int mapY = (int)player->position.y;
+    int mapX = (int) player->position.x;
+    int mapY = (int) player->position.y;
 
     // 4. Calculate distance to next side
     double deltaDistX = (rayDir.x == 0) ? 1e30 : fabs(1.0 / rayDir.x);
@@ -44,24 +50,18 @@ void shoot_one_ray(const graphics_t *graphics, const raycaster_t *raycaster, con
     // Length of ray from current position to next x or y-side
     double sideDistX, sideDistY;
 
-    if (rayDir.x < 0)
-    {
+    if (rayDir.x < 0) {
         stepX = -1;
         sideDistX = (player->position.x - mapX) * deltaDistX;
-    }
-    else
-    {
+    } else {
         stepX = 1;
         sideDistX = (mapX + 1.0 - player->position.x) * deltaDistX;
     }
 
-    if (rayDir.y < 0)
-    {
+    if (rayDir.y < 0) {
         stepY = -1;
         sideDistY = (player->position.y - mapY) * deltaDistY;
-    }
-    else
-    {
+    } else {
         stepY = 1;
         sideDistY = (mapY + 1.0 - player->position.y) * deltaDistY;
     }
@@ -70,23 +70,18 @@ void shoot_one_ray(const graphics_t *graphics, const raycaster_t *raycaster, con
     int hit = 0;
     int side; // If X side is hit = 0, If Y side is hit = 1
 
-    while (!hit)
-    {
-        if (sideDistX < sideDistY)
-        {
+    while (!hit) {
+        if (sideDistX < sideDistY) {
             sideDistX += deltaDistX;
             mapX += stepX;
             side = 0;
-        }
-        else
-        {
+        } else {
             sideDistY += deltaDistY;
             mapY += stepY;
             side = 1;
         }
 
-        if (mapX < 0 || mapX >= MAP_WIDTH || mapY < 0 || mapY >= MAP_HEIGHT)
-        {
+        if (mapX < 0 || mapX >= MAP_WIDTH || mapY < 0 || mapY >= MAP_HEIGHT) {
             hit = 1;
             break;
         }
@@ -102,10 +97,17 @@ void shoot_one_ray(const graphics_t *graphics, const raycaster_t *raycaster, con
     else
         perpWallDist = (mapY - player->position.y + (1 - stepY) / 2.0) / rayDir.y;
 
-    // 7. Calculate line height
-    const int lineHeight = (int)(FRAME_BUFFER_HEIGHT / perpWallDist);
+    // 7. Keep tracking of ray_hit infos so you can draw them on map
+    ray_hit_t hit_info;
+    hit_info.hit_x = player->position.x + rayDir.x * perpWallDist;
+    hit_info.hit_y = player->position.y + rayDir.y * perpWallDist;
 
-    // 8. Determine start and end of wall
+    raycaster->ray_hits[x] = hit_info;
+
+    // 8. Calculate line height
+    const int lineHeight = (int) (FRAME_BUFFER_HEIGHT / perpWallDist);
+
+    // 9. Determine start and end of wall
     int drawStart = -lineHeight / 2 + FRAME_BUFFER_HEIGHT / 2;
     if (drawStart < 0)
         drawStart = 0;
@@ -114,15 +116,15 @@ void shoot_one_ray(const graphics_t *graphics, const raycaster_t *raycaster, con
     if (drawEnd >= FRAME_BUFFER_HEIGHT)
         drawEnd = FRAME_BUFFER_HEIGHT - 1;
 
-    // 9. Draw Ceiling
+    // 10. Draw Ceiling
     for (int y = 0; y < drawStart; y++)
         put_pixel(graphics->frame_buffer, x, y, CEILING_COLOR);
 
-    // 10. Draw Wall
+    // 11. Draw Wall
     for (int y = drawStart; y <= drawEnd; y++)
         put_pixel(graphics->frame_buffer, x, y, side == 0 ? WALL_DARK_COLOR : WALL_COLOR);
 
-    // 11. Draw Floor
+    // 12. Draw Floor
     for (int y = drawEnd + 1; y < FRAME_BUFFER_HEIGHT; y++)
         put_pixel(graphics->frame_buffer, x, y, FLOOR_COLOR);
 }

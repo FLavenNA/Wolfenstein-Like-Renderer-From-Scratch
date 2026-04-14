@@ -5,7 +5,7 @@
 #include "player.h"
 #include "primitive_renderer.h"
 
-void draw_map(const graphics_t *graphics, const map_t *map, const player_t *player)
+void draw_map(const graphics_t *graphics, const map_t *map, const player_t *player, const raycaster_t *raycaster)
 {
     if (!graphics || !graphics->frame_buffer || !map)
         return;
@@ -58,8 +58,10 @@ void draw_map(const graphics_t *graphics, const map_t *map, const player_t *play
         }
     }
 
-    if (player)
+    if (player) {
         draw_minimap_player(fb, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, player, x0, y0, TILE_SIZE);
+        draw_raycasts(fb, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, player, raycaster, x0, y0, TILE_SIZE);
+    }
 }
 
 void draw_minimap_player(uint32_t *frame_buffer, const int frame_buffer_width, const int frame_buffer_height, const player_t *player, const int offset_x, const int offset_y, const float tile_size) {
@@ -70,22 +72,26 @@ void draw_minimap_player(uint32_t *frame_buffer, const int frame_buffer_width, c
     // Player dot radius
     const int radius = (int)(PLAYER_RADIUS * tile_size);
 
-    // 🔥 Direction line
-    const float dir_length = tile_size * 0.75f;
-
-    const int dir_x = (int)(px + player->dir.x * dir_length);
-    const int dir_y = (int)(py + player->dir.y * dir_length);
-
     // Draw the player (yellow)
     draw_filled_circle(frame_buffer, frame_buffer_width, frame_buffer_height, px, py, radius, MINI_MAP_PLAYER_COLOR);
+}
 
-    // Draw direction line
-    draw_line(frame_buffer,
+void draw_raycasts(uint32_t *frame_buffer, int frame_buffer_width, int frame_buffer_height, const player_t *player, const raycaster_t *raycaster, int offset_x, int offset_y, float tile_size) {
+    // Convert world → minimap pixel coordinates
+    const int px = (int)(offset_x + player->position.x * tile_size);
+    const int py = (int)(offset_y + player->position.y * tile_size);
+
+    for (int i = 0; i < FRAME_BUFFER_WIDTH; i++) {
+        const int x1 = (int)(offset_x + raycaster->ray_hits[i].hit_x * tile_size);
+        const int y1 = (int)(offset_y + raycaster->ray_hits[i].hit_y * tile_size);
+
+        draw_line(frame_buffer,
           frame_buffer_width,
           frame_buffer_height,
           px,
           py,
-          dir_x,
-          dir_y,
+          x1,
+          y1,
           MINI_MAP_PLAYER_COLOR);
+    }
 }

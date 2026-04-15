@@ -30,7 +30,7 @@ void draw_map(const graphics_t *graphics, const map_t *map, const player_t *play
             continue;
 
         for (int x = 0; x < MAP_WIDTH; ++x) {
-            const uint32_t color = (map->data[y][x] == 1)
+            const uint32_t color = (map->data[y][x] > 0)
                                        ? MINI_MAP_WALL_COLOR
                                        : MINI_MAP_PATH_COLOR;
 

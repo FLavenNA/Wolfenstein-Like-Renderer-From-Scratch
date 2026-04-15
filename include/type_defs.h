@@ -21,5 +21,6 @@ typedef struct vec2 vec2_t;
 // Game type defs
 typedef struct map map_t;
 typedef struct player player_t;
+typedef struct world world_t;
 
 #endif

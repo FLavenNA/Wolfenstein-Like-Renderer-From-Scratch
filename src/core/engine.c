@@ -12,6 +12,7 @@ bool engine_init(engine_t *engine)
     time_init(&engine->time);
     init_camera_table(&engine->raycaster);
     init_raycast_hits(&engine->raycaster);
+    init_textures(engine->world.textures);
 
     engine->state = RUNNING;
     return true;

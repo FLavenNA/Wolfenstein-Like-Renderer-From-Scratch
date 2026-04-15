@@ -1,12 +1,13 @@
 #include <stdlib.h>
-#include  <stdio.h>
+#include <stdio.h>
 
-
+#include "raycaster.h"
 #include "colors.h"
 #include "graphics.h"
 #include "map.h"
 #include "player.h"
 #include "primitive_renderer.h"
+#include "world.h"
 
 void init_camera_table(raycaster_t *raycaster) {
     for (int x = 0; x < FRAME_BUFFER_WIDTH; x++) {
@@ -21,13 +22,13 @@ void init_raycast_hits(raycaster_t *raycaster) {
     }
 }
 
-void raycast(const graphics_t *graphics, const raycaster_t *raycaster, const player_t *player, const map_t *map) {
+void raycast(const graphics_t *graphics, raycaster_t *raycaster, const player_t *player, const map_t *map, const world_t *world) {
     for (int x = 0; x < FRAME_BUFFER_WIDTH; x++)
-        shoot_one_ray(graphics, raycaster, player, map, x);
+        shoot_one_ray(graphics, raycaster, player, map, world, x);
 }
 
 void shoot_one_ray(const graphics_t *graphics, raycaster_t *raycaster, const player_t *player, const map_t *map,
-                   const int x) {
+                    const world_t *world, const int x) {
     // 1. Camera space x-coordinate (-1 to 1)
     const double cameraX = raycaster->camera_x_table[x];
 
@@ -120,11 +121,33 @@ void shoot_one_ray(const graphics_t *graphics, raycaster_t *raycaster, const pla
     for (int y = 0; y < drawStart; y++)
         put_pixel(graphics->frame_buffer, x, y, CEILING_COLOR);
 
-    // 11. Draw Wall
-    for (int y = drawStart; y <= drawEnd; y++)
-        put_pixel(graphics->frame_buffer, x, y, side == 0 ? WALL_DARK_COLOR : WALL_COLOR);
-
-    // 12. Draw Floor
+    // 11. Draw Floor
     for (int y = drawEnd + 1; y < FRAME_BUFFER_HEIGHT; y++)
         put_pixel(graphics->frame_buffer, x, y, FLOOR_COLOR);
+
+    // 12. Calculate texture coordinates and draw them
+    double wall_x;
+    if (side == 0)  wall_x = player->position.y + perpWallDist * rayDir.y;
+    else            wall_x = player->position.x + perpWallDist * rayDir.x;
+    wall_x -= floor(wall_x);
+
+    // Calculate X coordinate of texture
+    int texture_x = (int)(wall_x * (double)TEXTURE_WIDTH);
+    if(side == 0 && rayDir.x > 0) texture_x = TEXTURE_WIDTH - texture_x - 1;
+    if(side == 1 && rayDir.y < 0) texture_x = TEXTURE_WIDTH - texture_x - 1;
+
+    int texture_num = map->data[mapY][mapX];
+    if (texture_num < 0) texture_num = 1;
+
+    // Step for coordinates
+    double step = 1.0 * TEXTURE_HEIGHT / lineHeight;
+    double texture_pos = (drawStart - FRAME_BUFFER_HEIGHT / 2 + lineHeight / 2) * step;
+
+    for (int y = drawStart; y <= drawEnd; y++) {
+        int texture_y = (int)texture_pos & (TEXTURE_HEIGHT - 1);
+        texture_pos += step;
+
+        const uint32_t color = world->textures[texture_num][TEXTURE_HEIGHT * texture_y + texture_x];
+        put_pixel(graphics->frame_buffer, x, y, color);
+    }
 }

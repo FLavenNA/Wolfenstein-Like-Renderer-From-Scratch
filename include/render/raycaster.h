@@ -16,7 +16,7 @@ struct raycaster {
 
 void init_camera_table(raycaster_t *raycaster);
 void init_raycast_hits(raycaster_t *raycaster);
-void raycast(const graphics_t *graphics, raycaster_t *raycaster, const player_t *player, const map_t *map);
-void shoot_one_ray(const graphics_t *graphics, const raycaster_t *raycaster, const player_t *player, const map_t *map, int x);
+void raycast(const graphics_t *graphics, raycaster_t *raycaster, const player_t *player, const map_t *map, const world_t *world);
+void shoot_one_ray(const graphics_t *graphics, raycaster_t *raycaster, const player_t *player, const map_t *map, const world_t *world, int x);
 
 #endif

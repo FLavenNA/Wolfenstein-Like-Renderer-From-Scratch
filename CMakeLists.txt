@@ -35,7 +35,8 @@ target_include_directories(Wolfenstein-Like-Renderer PRIVATE
                          ${CMAKE_SOURCE_DIR}/include/core
                          ${CMAKE_SOURCE_DIR}/include/render
                          ${CMAKE_SOURCE_DIR}/include/utils
-                         ${CMAKE_SOURCE_DIR}/include/game)
+                         ${CMAKE_SOURCE_DIR}/include/game
+                         ${CMAKE_SOURCE_DIR}/libs/STB)
                          
 target_link_libraries(Wolfenstein-Like-Renderer 
     PRIVATE

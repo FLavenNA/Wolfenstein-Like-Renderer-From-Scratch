@@ -127,8 +127,8 @@ void shoot_one_ray(const graphics_t *graphics, raycaster_t *raycaster, const pla
 
     // 12. Calculate texture coordinates and draw them
     double wall_x;
-    if (side == 0)  wall_x = player->position.y + perpWallDist * rayDir.y;
-    else            wall_x = player->position.x + perpWallDist * rayDir.x;
+    if (side == 0)  wall_x = hit_info.hit_y;
+    else            wall_x = hit_info.hit_x;
     wall_x -= floor(wall_x);
 
     // Calculate X coordinate of texture
@@ -140,14 +140,18 @@ void shoot_one_ray(const graphics_t *graphics, raycaster_t *raycaster, const pla
     if (texture_num < 0) texture_num = 1;
 
     // Step for coordinates
-    double step = 1.0 * TEXTURE_HEIGHT / lineHeight;
+    const double step = 1.0 * TEXTURE_HEIGHT / lineHeight;
     double texture_pos = (drawStart - FRAME_BUFFER_HEIGHT / 2 + lineHeight / 2) * step;
 
     for (int y = drawStart; y <= drawEnd; y++) {
-        int texture_y = (int)texture_pos & (TEXTURE_HEIGHT - 1);
+        const int texture_y = (int)texture_pos & (TEXTURE_HEIGHT - 1);
         texture_pos += step;
 
-        const uint32_t color = world->textures[texture_num][TEXTURE_HEIGHT * texture_y + texture_x];
+        uint32_t color = world->textures[texture_num][TEXTURE_HEIGHT * texture_y + texture_x];
+        
+        // Apply shadowing to sides
+        if(side == 1) color = (color >> 1) & 2139062143;
+
         put_pixel(graphics->frame_buffer, x, y, color);
     }
 }

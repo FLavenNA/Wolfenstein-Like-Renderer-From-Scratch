@@ -117,13 +117,39 @@ void shoot_one_ray(const graphics_t *graphics, raycaster_t *raycaster, const pla
     if (drawEnd >= FRAME_BUFFER_HEIGHT)
         drawEnd = FRAME_BUFFER_HEIGHT - 1;
 
-    // 10. Draw Ceiling
-    for (int y = 0; y < drawStart; y++)
-        put_pixel(graphics->frame_buffer, x, y, CEILING_COLOR);
+    // 10 & 11. Draw Textured Floor and Ceiling
+    for (int y = drawEnd + 1; y < FRAME_BUFFER_HEIGHT; y++) {
+        // Current y distance relative to the center of the screen (horizon)
+        const double p = y - FRAME_BUFFER_HEIGHT / 2.0;
 
-    // 11. Draw Floor
-    for (int y = drawEnd + 1; y < FRAME_BUFFER_HEIGHT; y++)
-        put_pixel(graphics->frame_buffer, x, y, FLOOR_COLOR);
+        // Vertical distance from the camera to the floor (0.5 is the middle of the wall height)
+        const double pos_z = 0.5 * FRAME_BUFFER_HEIGHT;
+
+        // Horizontal distance from the camera to the floor for this row
+        const double row_distance = pos_z / p;
+
+        // Calculate the real world coordinates of the floor point
+        // rayDir is the direction vector for the current column x
+        const double floor_x = player->position.x + row_distance * rayDir.x;
+        const double floor_y = player->position.y + row_distance * rayDir.y;
+
+        // Get the texture coordinates from the fractional part of the world coordinates
+        const int floor_text_x = (int)(TEXTURE_WIDTH * (floor_x - floor(floor_x))) & (TEXTURE_WIDTH - 1);
+        const int floor_text_y = (int)(TEXTURE_HEIGHT * (floor_y - floor(floor_y))) & (TEXTURE_HEIGHT - 1);
+
+        // Floor
+        uint32_t color;
+        color = world->textures[3][TEXTURE_WIDTH * floor_text_y + floor_text_x];
+        //Apply shadowing
+        color = (color >> 1) & 2139062143;
+        put_pixel(graphics->frame_buffer, x, y, color);
+
+        // Ceiling (Symmetrical to floor)
+        color = world->textures[6][TEXTURE_WIDTH * floor_text_y + floor_text_x];
+        //Apply shadowing
+        color = (color >> 1) & 2139062143;
+        put_pixel(graphics->frame_buffer, x, FRAME_BUFFER_HEIGHT - y, color);
+    }
 
     // 12. Calculate texture coordinates and draw them
     double wall_x;

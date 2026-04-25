@@ -3,8 +3,8 @@
 
 #include "type_defs.h"
 
-#define MAP_WIDTH   16
-#define MAP_HEIGHT  12
+#define MAP_WIDTH   24
+#define MAP_HEIGHT  24
 #define TILE_SIZE   16 // Pixels in map view
 
 struct map {

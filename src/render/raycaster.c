@@ -136,8 +136,7 @@ void shoot_one_ray(const graphics_t *graphics, raycaster_t *raycaster, const pla
     if(side == 0 && rayDir.x > 0) texture_x = TEXTURE_WIDTH - texture_x - 1;
     if(side == 1 && rayDir.y < 0) texture_x = TEXTURE_WIDTH - texture_x - 1;
 
-    int texture_num = map->data[mapY][mapX];
-    if (texture_num < 0) texture_num = 1;
+    const int texture_num = map->data[mapY][mapX] - 1;
 
     // Step for coordinates
     const double step = 1.0 * TEXTURE_HEIGHT / lineHeight;

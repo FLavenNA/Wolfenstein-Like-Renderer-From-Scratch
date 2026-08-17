@@ -10,7 +10,7 @@
 void render(const engine_t *engine) {
     clear_screen_buffer(&engine->graphics);
 
-    raycast(&engine->graphics, &engine->raycaster, &engine->player, &engine->map, &engine->world);
+    raycast(&engine->graphics, &engine->raycaster, &engine->player, &engine->map, &engine->world, &engine->sprite_manager);
     draw_map(&engine->graphics, &engine->map, &engine->player, &engine->raycaster);
     draw_fps_counter(&engine->graphics);
 

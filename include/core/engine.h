@@ -8,6 +8,7 @@
 #include "input.h"
 #include "time.h"
 #include "raycaster.h"
+#include "sprite.h"
 #include "world.h"
 
 typedef enum engine_state
@@ -19,15 +20,17 @@ typedef enum engine_state
 
 struct engine 
 {
-    engine_state_t state;       // State of the engine
-    graphics_t graphics;        // SDL Graphics related things
-    map_t map;                  // Basic 2D map
-    player_t player;            // Player
-    keymap_t key_map;           // Key map and key codes
-    key_states_t key_states;    // Key states Up-Down
-    etime_t time;               // Time related things for engine
-    raycaster_t raycaster;      // Raycasting related data stuff
-    world_t world;              // World related stuff
+    engine_state_t state;                   // State of the engine
+    graphics_t graphics;                    // SDL Graphics related things
+    map_t map;                              // Basic 2D map
+    player_t player;                        // Player
+    keymap_t key_map;                       // Key map and key codes
+    key_states_t key_states;                // Key states Up-Down
+    etime_t time;                           // Time related things for engine
+    raycaster_t raycaster;                  // Raycasting related data stuff
+    world_t world;                          // World related stuff
+
+    sprite_manager_t sprite_manager;        // Sprite manager to handle sprite things on world
 };
 
 bool engine_init(engine_t *engine);

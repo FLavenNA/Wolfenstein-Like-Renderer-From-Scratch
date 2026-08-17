@@ -2,11 +2,11 @@
 #include <stdio.h>
 
 #include "raycaster.h"
-#include "colors.h"
 #include "graphics.h"
 #include "map.h"
 #include "player.h"
 #include "primitive_renderer.h"
+#include "sprite.h"
 #include "world.h"
 
 void init_camera_table(raycaster_t *raycaster) {
@@ -22,13 +22,79 @@ void init_raycast_hits(raycaster_t *raycaster) {
     }
 }
 
-void raycast(const graphics_t *graphics, raycaster_t *raycaster, const player_t *player, const map_t *map, const world_t *world) {
+void raycast(const graphics_t *graphics, raycaster_t *raycaster, const player_t *player, const map_t *map, const world_t *world, sprite_manager_t *sprite_manager) {
     for (int x = 0; x < FRAME_BUFFER_WIDTH; x++)
-        shoot_one_ray(graphics, raycaster, player, map, world, x);
+        shoot_one_ray(graphics, raycaster, player, map, world, sprite_manager, x);
+
+    // Sprite Casting
+    //sort sprites from far to close
+    for(int i = 0; i < NUM_SPRITES; i++)
+    {
+        sprite_manager->sprite_order[i] = i;
+        sprite_manager->sprite_distance[i] = ((player->position.x - sprite_manager->sprites[i].x) * (player->position.x - sprite_manager->sprites[i].x) +
+            (player->position.y - sprite_manager->sprites[i].y) * (player->position.y - sprite_manager->sprites[i].y));
+    }
+
+    sort_sprites(sprite_manager->sprite_order, sprite_manager->sprite_distance, NUM_SPRITES);
+
+    for(int i = 0; i < NUM_SPRITES; i++)
+    {
+      //translate sprite position to relative to camera
+      const double sprite_x = sprite_manager->sprites[sprite_manager->sprite_order[i]].x - player->position.x;
+      const double sprite_y = sprite_manager->sprites[sprite_manager->sprite_order[i]].y - player->position.y;
+
+      //transform sprite with the inverse camera matrix
+      // [ planeX   dirX ] -1                                       [ dirY      -dirX ]
+      // [               ]       =  1/(planeX*dirY-dirX*planeY) *   [                 ]
+      // [ planeY   dirY ]                                          [ -planeY  planeX ]
+
+      const double inv_det = 1.0 / (player->plane.x * player->dir.y - player->dir.x * player->plane.y); //required for correct matrix multiplication
+
+      const double transform_x = inv_det * (player->dir.y * sprite_x - player->dir.x * sprite_y);
+      const double transform_y = inv_det * (-player->plane.y * sprite_x + player->plane.x * sprite_y); //this is actually the depth inside the screen, that what Z is in 3D
+
+      const int sprite_screen_x = (int)((FRAME_BUFFER_WIDTH / 2) * (1 + transform_x / transform_y));
+
+      //calculate height of the sprite on screen
+      const int sprite_height = abs((int)(FRAME_BUFFER_HEIGHT / (transform_y))); //using 'transformY' instead of the real distance prevents fisheye
+      //calculate lowest and highest pixel to fill in current stripe
+      int drawStartY = -sprite_height / 2 + FRAME_BUFFER_HEIGHT / 2;
+      if(drawStartY < 0) drawStartY = 0;
+      int drawEndY = sprite_height / 2 + FRAME_BUFFER_HEIGHT / 2;
+      if(drawEndY >= FRAME_BUFFER_HEIGHT) drawEndY = FRAME_BUFFER_HEIGHT - 1;
+
+      //calculate width of the sprite
+      int spriteWidth = abs( (int) (FRAME_BUFFER_HEIGHT / (transform_y)));
+      int drawStartX = -spriteWidth / 2 + sprite_screen_x;
+      if(drawStartX < 0) drawStartX = 0;
+      int drawEndX = spriteWidth / 2 + sprite_screen_x;
+      if(drawEndX >= FRAME_BUFFER_WIDTH) drawEndX = FRAME_BUFFER_WIDTH - 1;
+
+      //loop through every vertical stripe of the sprite on screen
+      for(int stripe = drawStartX; stripe < drawEndX; stripe++)
+      {
+        int sprite_tex_x = (int)(256 * (stripe - (-spriteWidth / 2 + sprite_screen_x)) * TEXTURE_WIDTH / spriteWidth) / 256;
+        //the conditions in the if are:
+        //1) it's in front of camera plane so you don't see things behind you
+        //2) it's on the screen (left)
+        //3) it's on the screen (right)
+        //4) ZBuffer, with perpendicular distance
+        if(transform_y > 0 && stripe > 0 && stripe < FRAME_BUFFER_WIDTH && transform_y < sprite_manager->z_buffer[stripe])
+        for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
+        {
+          int d = (y) * 256 - FRAME_BUFFER_HEIGHT * 128 + sprite_height * 128; //256 and 128 factors to avoid floats
+          int sprite_tex_y = ((d * TEXTURE_HEIGHT) / sprite_height) / 256;
+          uint32_t color = world->textures[sprite_manager->sprites[sprite_manager->sprite_order[i]].texture][
+              TEXTURE_WIDTH * sprite_tex_y + sprite_tex_x];
+          if ((color & 0x00FFFFFF) != 0) put_pixel(graphics->frame_buffer, stripe, y, color);
+          //paint pixel if it isn't black, black is the invisible color
+        }
+      }
+    }
 }
 
 void shoot_one_ray(const graphics_t *graphics, raycaster_t *raycaster, const player_t *player, const map_t *map,
-                    const world_t *world, const int x) {
+                    const world_t *world, sprite_manager_t *sprite_manager, const int x) {
     // 1. Camera space x-coordinate (-1 to 1)
     const double cameraX = raycaster->camera_x_table[x];
 
@@ -151,7 +217,7 @@ void shoot_one_ray(const graphics_t *graphics, raycaster_t *raycaster, const pla
         put_pixel(graphics->frame_buffer, x, FRAME_BUFFER_HEIGHT - y, color);
     }
 
-    // 12. Calculate texture coordinates and draw them
+    // 12. Calculate wall texture coordinates and draw them
     double wall_x;
     if (side == 0)  wall_x = hit_info.hit_y;
     else            wall_x = hit_info.hit_x;
@@ -179,4 +245,7 @@ void shoot_one_ray(const graphics_t *graphics, raycaster_t *raycaster, const pla
 
         put_pixel(graphics->frame_buffer, x, y, color);
     }
+
+    // For sprite rendering
+    sprite_manager->z_buffer[x] = perpWallDist;
 }

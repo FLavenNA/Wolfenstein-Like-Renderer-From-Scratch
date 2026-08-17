@@ -82,6 +82,11 @@ void graphics_cleanup(graphics_t *graphics) {
 
     graphics->texture = NULL;
 
+    if (graphics->font) 
+        TTF_CloseFont(graphics->font);
+
+    graphics->font = NULL;
+    
     TTF_Quit();
     SDL_Quit();
 }

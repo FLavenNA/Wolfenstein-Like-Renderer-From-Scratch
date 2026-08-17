@@ -22,5 +22,8 @@ typedef struct vec2 vec2_t;
 typedef struct map map_t;
 typedef struct player player_t;
 typedef struct world world_t;
+typedef struct sprite sprite_t;
+typedef struct sprite_sort_item sprite_sort_item_t;
+typedef struct sprite_manager sprite_manager_t;
 
 #endif
